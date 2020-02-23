@@ -1,7 +1,10 @@
+import math
+import hashlib
+from helper import hex_distance
+
 b = 2
 N = 100
-import hashlib
-import math
+
 
 class Node():
 	def __init__(self, hash_string):
@@ -25,16 +28,6 @@ class Node():
 			print(x)
 		print("[#] Neighborhood Set: \n", self.M)
 		print("[#] Leaf Set: \n", self.L)
-
-	@staticmethod
-	def id_compare(id1, id2):
-		hex_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
-		idx = None
-		for i in range(32):
-			if id1[i] != id2[i]:
-				idx = i
-				return (idx, hex_map[id1[idx]]-hex_map[id2[idx]])
-		return (idx, None)
 
 	def forward_if_in_leaf_set_range(self, D):
 		minL = None
@@ -68,26 +61,25 @@ class Node():
 		if (not minPresent) and (not maxPresent):
 			return (True, )
 
-	@staticmethod
-	def common_prefix(K, node_id):
-		for i in range(32):
-			if K[i] != node_id[i]:
-				return i
-		return -1
+	def forward(self, msg, key):
+		if msg.lower()=="join":
+			# all of the middle nodes have to send their tables
+		else:
+			pass
 
 	def routing(self, msg, key):
 		if len(key) is not 128:
 			D = hashlib.md5(key.encode()).hexdigest() 
 
-		# comapring with leaf set
+		# see in leaf set
 		# self.forward_if_in_leaf_set_range(D)
 		t = False
 		if t:
+			# forward to node found in leaf set
 			pass
 		else:
 			I = self.common_prefix(D, self.hash_string)
-			if I == -1:
-				print("[!] Error")
+
 			if self.R[I][D[l]] is not None:
 				self.forward()
 			else:

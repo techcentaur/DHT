@@ -1,0 +1,14 @@
+1. complete the routing algorithm---------------------done
+	- forward if in leaf set------------------------done
+	- check in all of L U M--------------------------done
+
+
+how to know that this is the node--------------?
+
+- write the query lookup and query insertion
+
+2. check if node adding correctly
+
+3. write delete node
+
+4. debug start

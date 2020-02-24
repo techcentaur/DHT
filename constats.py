@@ -1,0 +1,3 @@
+b = 2
+N = 10
+JOIN_MESSAGE = "JOIN_PASTRY"

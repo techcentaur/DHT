@@ -22,7 +22,7 @@ class Node():
 		# in min: from right -> left
 		# in max: from left -> right
 
-		self.HT = {}
+		self.HT = {} # data structure
 
 	def print_tables(self):
 		print("[*] Node id: ", self.hash_string)
@@ -96,85 +96,90 @@ class Node():
 		self.L[0][len(l0)*-1:] = l0
 		self.L[1][:len(l1)] = l1
 
-	def forward(self, msg, key, hops=0):
-		if len(key) is not 32:
-			key = hashlib.md5(key.encode()).hexdigest() 
-
-		if msg.upper()==JOIN_MESSAGE: # for [A-Z]
-			(x, y) = hex_distance(key, self.hash_string)
-			net.nodes[key].update_R(x, self.R[x])
-			
-			if hops==0: # for A // send M
-				net.nodes[key].update_M(self.M)
-
-			r = self.routing(msg, key, hops)
-			if not r: # for Z // sends L
-				net.nodes[key].update_L(self.L)
-				return True
-		else:
-			pass
-
-	def minimal_key(self, key):
-		# don't need list // can keep minimal yet
-
-		minimal = []
+	def minimal_key(self, key, __minx=-1, __miny=16, __minimal_key=None):
 		for i in range(len(self.L[0]), -1, -1):
 			if self.L[0][i]:
-				x, y = hex_distance(key, self.L[0][i])
-				# if x==32:
-					# this is the node
-				minimal.append(((x, -1*abs(y)), (0, i)))
+				x, y = hex_distance(key, self.L[0][i], absolute=True)
+				if (x > __minx) or ((x == __minx) and (y < __miny)):
+					__minx, __miny = x, y
+					__minimal_key = self.L[0][i]
+
 		for i in range(len(self.L[1])):
 			if self.L[1][i]:
-				minimal.append(((x, -1*abs(y)), (1, i)))
+				x, y = hex_distance(key, self.L[1][i], absolute=True)
+				if (x > __minx) or ((x == __minx) and (y < __miny)):
+					__minx, __miny = x, y
+					__minimal_key = self.L[1][i]
 
-		minimal.sort(key=lambda x: x[0])
-		
-		k = minimal[-1][1]
-		return self.L[k[0]][k[1]]
+			
+		x, y = hex_distance(self.hash_string, key, absolute=True)
+		if (x > __minx) or ((x == __minx) and (y < __miny)):
+			__minx, __miny = x, y
+			__minimal_key = self.hash_string
 
-	def all_set_minimal(self, key, I, Y):
-		# L set i already searched right?
+		return __minimal_key
 
+	def all_set_minimal(self, key, __minx=-1, __miny=16, __minimal_key=None):
 		__minx, __miny = I, Y
+		__minimal_key = self.hash_string
 
 		for i in range(I, len(self.R)):
 			for j in range(len(self.R[0])):
 				if self.R[i][j]:
-					x, y = hex_compare(key, self.R[i][j], absolute=True)
-					if (x > __minx or (x==__minx and y < __miny)) and ():
-						minimal = self.R[i][j]
-						return minimal
+					x, y = hex_distance(key, self.R[i][j], absolute=True)
+					if (x > __minx) or (x==__minx and y < __miny):
+						__minx, __miny = x, y
+						__minimal_key = self.R[i][j]
 
 		for i in range(len(self.M)):
 			x, y = hex_compare(key, self.M[i])
 			if x > __minx or (x==__minx and y < __miny):
-				minimal = self.R[i][j]
-				return minimal
+				__minx, __miny = x, y
+				__minimal_key = self.M[i]
 
-		return None
+		__minimal_key = self.minimal_key(key, __minx=__minx, __miny=__miny, __minimal_key=__minimal_key)
+		return __minimal_key
 
+	def forward(self, msg, key, first_hop=False):
+		if msg==JOIN_MESSAGE: # for [A-Z] // send R
+			(x, y) = hex_distance(key, self.hash_string)
+			net.nodes[key].update_R(x, self.R[x])
+			
+			if first_hop: # for A // send M
+				net.nodes[key].update_M(self.M)
+			return self.__forward__(msg, key)
+		else:
+			return self.__forward__(msg, key)
 
-
-	def routing(self, msg, key, hops=0):
-		is_routed = False
+	def __forward__(self, msg, key):
 		if self.in_leaf_set(key):
 			__key = self.minimal_key(key)
-			is_routed = net.nodes[__key].forward(msg, key, hops+1)
+			if __key == self.hash_string:
+				if msg==JOIN_MESSAGE:
+					net.nodes[key].update_L(self.L)
+				elif msg==LOOKUP_MESSAGE:
+					return self.HT[key]
+				else:
+					self.HT[key] = msg
+			else:
+				return net.nodes[__key].forward(msg, key)
 		else:
 			(I, y) = hex_distance(key, self.hash_string)
 
 			if self.R[I][D[I]] is not None:
-				is_routed = net.nodes[self.R[I][key[I]]].forward(msg, key, hops+1)
+				return net.nodes[self.R[I][key[I]]].forward(msg, key)
 			else:
-				__key = self.all_set_minimal(key, I, y)
-				if __key:
-					is_routed = net.nodes[self.R[I][key[I]]].forward(msg, key, hops+1)
+				__key = self.all_set_minimal(key, I, y, self.hash_string)
+				if __key == self.hash_string:
+					if msg==JOIN_MESSAGE:
+						net.nodes[key].update_L(self.L)
+					elif msg==LOOKUP_MESSAGE:
+						return self.HT[key]
+					else:
+						self.HT[key] = msg
 				else:
-					pass
-
-		return is_routed
-
+					return net.nodes[self.R[I][key[I]]].forward(msg, key)
+		return True
 
 if __name__ == '__main__':
 	n = Node(hashlib.md5("Ankit Solanki".encode()).hexdigest())

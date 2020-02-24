@@ -1,8 +1,6 @@
-# import matplotlib
-# import matplotlib.pyplot as plt
-
-def expanding_ring_algorithm(x, y, size):
+def expanding_ring_algorithm(tup, size):
 	"""return list(points) in expanding squares with radius = size"""
+	x, y = tup
 
 	p1 = (x+size, y+size)
 	p2 = (x-size, y-size)
@@ -21,9 +19,6 @@ def expanding_ring_algorithm(x, y, size):
 
 	points.append((x-size, y+size))
 	points.append((x+size, y-size))
-	# for p in points:
-	# 	plt.scatter(p[0], p[1])
-	# plt.show()
 
 	return points
 
@@ -73,3 +68,7 @@ def hex_compare(id1, id2, equality=True, none_check=False, num_bytes=32):
 					return True
 				else:
 					return False
+
+def distance_metric(origin, point):
+	point = (point[0]-origin[0], point[1]-origin[1])
+	return max(abs(point[0]), abs(point[1]))

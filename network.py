@@ -1,5 +1,3 @@
-import random
-import numpy as np
 from hashlib import md5
 
 from node import Node
@@ -16,16 +14,27 @@ class Network():
 		x, y = net.get_new_coordinates()
 		node_hash = md5((str(x) + "+" + str(y)).encode()).hexdigest()
 
-		net.ping[x, y] = 1 # node alive
-		net.nodes[node_hash] = Node(node_hash)
+		print("[*] Trying to add ".format(x, y))
 
-		A = net.get_proximity_close_alive_node(x, y)
+		net.P[x, y] = 1 # node alive
+		net.nodes[node_hash] = Node(node_hash, x, y)
+
+		A = net.get_proximity_close_alive_node((x, y))
+		res = False
 		if A:
 			A_hash = md5((str(A[0]) + "+" + str(A[1])).encode()).hexdigest()
+			print(A_hash)
 			res = net.nodes[A_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
-			if res:
-				print("[*] New node inserted @ ({},{})".format(x, y))
-				print("[#] Node properties: \n", net.nodes[node_hash].print_tables())
+			while True:
+				pass
+		else:
+			# first node in network
+			res = True
+			pass
+		if res:
+			print("[*] New node inserted @ ({},{})".format(x, y))
+			print("[#] Node properties: \n")
+			net.nodes[node_hash].print_tables()
 
 	def lookup(self, msg, key):
 		data = next(iter(net.nodes.values)).forward(LOOKUP_MESSAGE, key)
@@ -36,7 +45,10 @@ class Network():
 		if res:
 			print("[*] {}: {} // inserted successfully".format(key, msg))
 
+	def add_nodes(self, num=1):
+		for i in range(num):
+			self.add_node()
 
 if __name__ == '__main__':
 	n = Network()
-	n.add_node()
+	n.add_nodes(2)

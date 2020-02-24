@@ -6,8 +6,9 @@ from constats import *
 from internet import net
 
 class Node():
-	def __init__(self, hash_string):
+	def __init__(self, hash_string, x, y):
 		self.hash_string = hash_string
+		self.position = (x, y)
 		self.R = []
 
 		for i in range(math.ceil(math.log(N, pow(2, b)))):
@@ -25,12 +26,16 @@ class Node():
 		self.HT = {} # data structure
 
 	def print_tables(self):
+		print("{}".format("-"*40))
 		print("[*] Node id: ", self.hash_string)
+		print("[*] Position: ", self.position)
+
 		print("[#] Routing Table:")
 		for x in self.R:
 			print(x)
 		print("[#] Neighborhood Set: \n", self.M)
 		print("[#] Leaf Set: \n", self.L)
+		print("{}".format("-"*40))
 
 	def in_leaf_set(self, D):
 		min_bound = False if self.L[0][-1] else None
@@ -63,12 +68,13 @@ class Node():
 				if hex_compare(D, self.hash_string, equality=False, none_check=False):
 					return True
 				return False
-			elif max_bound if False:
+			elif max_bound is False:
 				return False
 			else:
 				return False
 
 	def update_R(self, row, data):
+		
 		self.R[row] = data
 
 	def update_M(self, M):
@@ -143,6 +149,7 @@ class Node():
 	def forward(self, msg, key, first_hop=False):
 		if msg==JOIN_MESSAGE: # for [A-Z] // send R
 			(x, y) = hex_distance(key, self.hash_string)
+			print("hiss", x, y)
 			net.nodes[key].update_R(x, self.R[x])
 			
 			if first_hop: # for A // send M
@@ -182,5 +189,6 @@ class Node():
 		return True
 
 if __name__ == '__main__':
-	n = Node(hashlib.md5("Ankit Solanki".encode()).hexdigest())
-	n.print_tables()
+	# n = Node(hashlib.md5("Ankit Solanki".encode()).hexdigest())
+	# n.print_tables()
+	pass

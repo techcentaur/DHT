@@ -16,21 +16,25 @@ class Network():
 		x, y = net.get_new_coordinates()
 		node_hash = md5((str(x) + "+" + str(y)).encode()).hexdigest()
 
-		print("[*] Adding new node, x, y are: ", x, y)		
-
 		net.ping[x, y] = 1 # node alive
 		net.nodes[node_hash] = Node(node_hash)
 
 		A = net.get_proximity_close_alive_node(x, y)
 		if A:
 			A_hash = md5((str(A[0]) + "+" + str(A[1])).encode()).hexdigest()
-			net.nodes[A_hash].forward(JOIN_MESSAGE, node_hash)
+			res = net.nodes[A_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
+			if res:
+				print("[*] New node inserted @ ({},{})".format(x, y))
+				print("[#] Node properties: \n", net.nodes[node_hash].print_tables())
 
-	def lookup(self, key):
-		pass
+	def lookup(self, msg, key):
+		data = next(iter(net.nodes.values)).forward(LOOKUP_MESSAGE, key)
+		print("[*] value is: ", data)
 
 	def insert(self, msg, key):
-		next(iter(net.nodes.values)).forward(msg, key)
+		res = next(iter(net.nodes.values)).forward(msg, key)
+		if res:
+			print("[*] {}: {} // inserted successfully".format(key, msg))
 
 
 if __name__ == '__main__':

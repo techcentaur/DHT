@@ -55,6 +55,9 @@ class Node():
 		
 		print("{}".format("-"*40))
 
+		print("[*] Data: ")
+		print(self.HT)
+
 	def in_leaf_set(self, D):
 		if self.L[0][-1]:
 			min_bound = False

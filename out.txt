@@ -1,0 +1,44 @@
+========================================
+[*] Trying to add (1, 0) | 4120871f362acd09acfa040f4d747773
+[*] New node inserted @ (1,0)
+[#] Node properties: 
+
+----------------------------------------
+[*] Node id:  4120871f362acd09acfa040f4d747773
+[*] Position:  (1, 0)
+[#] Routing Table:
+[None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Neighborhood Set: 
+ [None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Leaf Set: 
+ [[None, None, None, None, None, None, None, None], [None, None, None, None, None, None, None, None]]
+----------------------------------------
+========================================
+[*] Trying to add (4, 4) | 170a4e995e04369449d844c11eea025e
+170a4e995e04369449d844c11eea025e 4120871f362acd09acfa040f4d747773 0
+[*] New node inserted @ (4,4)
+[#] Node properties: 
+
+----------------------------------------
+[*] Node id:  4120871f362acd09acfa040f4d747773
+[*] Position:  (1, 0)
+[#] Routing Table:
+[None, '170a4e995e04369449d844c11eea025e', None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Neighborhood Set: 
+ [((4, 4), '170a4e995e04369449d844c11eea025e'), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Leaf Set: 
+ [[None, None, None, None, None, None, None, '170a4e995e04369449d844c11eea025e'], [None, None, None, None, None, None, None, None]]
+----------------------------------------
+----------------------------------------
+[*] Node id:  170a4e995e04369449d844c11eea025e
+[*] Position:  (4, 4)
+[#] Routing Table:
+[None, '170a4e995e04369449d844c11eea025e', None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Neighborhood Set: 
+ [((1, 0), '4120871f362acd09acfa040f4d747773'), None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None]
+[#] Leaf Set: 
+ [[], ['4120871f362acd09acfa040f4d747773', None, None, None, None, None, None, None]]
+----------------------------------------
+========================================
+[*] Trying to add (0, 2) | 90560d98b12bbf49e61d6ca2c07e0bd1
+90560d98b12bbf49e61d6ca2c07e0bd1 4120871f362acd09acfa040f4d747773 0

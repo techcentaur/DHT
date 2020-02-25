@@ -1,4 +1,11 @@
 - code for updating entry for M when new join 
 and when casually called
+- routing tabel and M should update themselves as per with leaf sets
+- run this for mutliple nodes and debug
+- write the code for delete
+- debug as a whole
+- write the results graph code
 
-- write delete node
+
+
+

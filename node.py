@@ -74,24 +74,26 @@ class Node():
 				return False
 
 	def update_R(self, row, data):
-		
+
 		self.R[row] = data
 
-	def update_M(self, M):
-		self.M = M
+	def update_M(self, M, pos, key):
 
-	def update_L(self, L):
-		leaves = []
+		self.M = [(pos, key)] + M[1:]
+
+	def update_L(self, L, key):
+		leaves = [(hex_distance(key, self.hash_string), key)]
+
 		for i in L[0]:
 			if i:
-				leaves.append(hex_distance(self.hash_string, i), i)
+				leaves.append(hex_distance(i, self.hash_string), i)
 		for i in L[1]:
 			if i:
-				leaves.append(hex_distance(self.hash_string, i), i)
+				leaves.append(hex_distance(i, self.hash_string), i)
 
 		l0, l1 = [], []
 		for i in leaves:
-			if i[1] < 0:
+			if i[0][1] < 0:
 				l0.append(i)
 			else:
 				l1.append(i)
@@ -99,11 +101,77 @@ class Node():
 		l0.sort(key=lambda x: x[0])
 		l1.sort(key=lambda x: x[0], reverse=True)
 
-		self.L[0][len(l0)*-1:] = l0
-		self.L[1][:len(l1)] = l1
+		self.L[0][len(l0)*-1:] = [x[1] for x in l0]
+		self.L[1][:len(l1)] = [x[1] for x in l1]
+
+	def transmit_state(self):
+		# to  M
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				net.nodes[self.M[i]].update_presence_of(self.hash_string, self.position)
+
+		# to R
+		for i in range(len(self.R)):
+			for j in range(len(self.R[0])):
+				if self.R[i][j] is not None:
+					net.nodes[self.R[i][j]].update_presence_of(self.hash_string, self.position)
+
+		# to L
+		for i in range(len(self.L[0])):
+			if self.L[0][i] is not None:
+				net.nodes[self.L[0][i]].update_presence_of(self.hash_string, self.position)
+
+		for i in range(len(self.L[1])):
+			if self.L[1][i] is not None:
+				net.nodes[self.L[1][i]].update_presence_of(self.hash_string, self.position)
+
+
+	def update_presence_of(self, new_key, new_pos):
+		(x, y) = hex_distance(new_key, self.hash_string)
+
+		# M
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				if distance_compare(self.position, net.nodes[self.M[i]].position, new_pos):
+					l = len(self.M)
+					self.M[i:i] = [(new_pos, new_key)]
+					self.M = self.M[:l]
+					break
+			else:
+				self.M[i] = (new_pos, new_key)
+				break
+
+		# L
+		if y>=0: # in L max
+			for i in range(len(self.L[1])):
+				if self.L[1][i] is not None:
+					print(self.L[1][i], new_key)
+					if hex_compare(self.L[1][i], new_key, equality=False):
+						l = len(self.L[1])
+						self.L[1][i:i] = [new_key]
+						self.L[1] = self.L[1][:l]
+						break
+				else:
+					self.L[1][i] = new_key
+					break
+		else: # in L min
+			for i in range(len(self.L[0])-1, -1, -1):
+				if self.L[0][i] is not None:
+					if hex_compare(new_key, self.L[0][i], equality=False):
+						l = len(self.L[0])
+						self.L[0][i:i] = [new_key]
+						self.L[0] = self.L[0][l*-1:]
+						break
+				else:
+					self.L[0][i] = new_key
+					break
+
+		# R
+		print(x, hex_map[new_key[x]])
+		self.R[x][hex_map[new_key[x]]] = new_key
 
 	def minimal_key(self, key, __minx=-1, __miny=16, __minimal_key=None):
-		for i in range(len(self.L[0]), -1, -1):
+		for i in range(len(self.L[0])-1, -1, -1):
 			if self.L[0][i]:
 				x, y = hex_distance(key, self.L[0][i], absolute=True)
 				if (x > __minx) or ((x == __minx) and (y < __miny)):
@@ -126,10 +194,7 @@ class Node():
 		return __minimal_key
 
 	def all_set_minimal(self, key, __minx=-1, __miny=16, __minimal_key=None):
-		__minx, __miny = I, Y
-		__minimal_key = self.hash_string
-
-		for i in range(I, len(self.R)):
+		for i in range(__minx, len(self.R)):
 			for j in range(len(self.R[0])):
 				if self.R[i][j]:
 					x, y = hex_distance(key, self.R[i][j], absolute=True)
@@ -138,12 +203,13 @@ class Node():
 						__minimal_key = self.R[i][j]
 
 		for i in range(len(self.M)):
-			x, y = hex_compare(key, self.M[i])
-			if x > __minx or (x==__minx and y < __miny):
-				__minx, __miny = x, y
-				__minimal_key = self.M[i]
+			if self.M[i]:
+				x, y = hex_distance(key, self.M[i])
+				if x > __minx or (x==__minx and y < __miny):
+					__minx, __miny = x, y
+					__minimal_key = self.M[i]
 
-		__minimal_key = self.minimal_key(key, __minx=__minx, __miny=__miny, __minimal_key=__minimal_key)
+		__minimal_key = self.minimal_key(key, __minx, __miny, __minimal_key)
 		return __minimal_key
 
 	def forward(self, msg, key, first_hop=False):
@@ -153,7 +219,7 @@ class Node():
 			net.nodes[key].update_R(x, self.R[x])
 			
 			if first_hop: # for A // send M
-				net.nodes[key].update_M(self.M)
+				net.nodes[key].update_M(self.M, self.position, self.hash_string)
 			return self.__forward__(msg, key)
 		else:
 			return self.__forward__(msg, key)
@@ -173,13 +239,13 @@ class Node():
 		else:
 			(I, y) = hex_distance(key, self.hash_string)
 
-			if self.R[I][D[I]] is not None:
-				return net.nodes[self.R[I][key[I]]].forward(msg, key)
+			if self.R[I][hex_map[key[I]]] is not None:
+				return net.nodes[self.R[I][hex_map[key[I]]]].forward(msg, key)
 			else:
 				__key = self.all_set_minimal(key, I, y, self.hash_string)
 				if __key == self.hash_string:
 					if msg==JOIN_MESSAGE:
-						net.nodes[key].update_L(self.L)
+						net.nodes[key].update_L(self.L, self.hash_string)
 					elif msg==LOOKUP_MESSAGE:
 						return self.HT[key]
 					else:

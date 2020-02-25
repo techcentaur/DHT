@@ -45,7 +45,7 @@ def hex_compare(id1, id2, equality=True, none_check=False, num_bytes=32):
 	"""
 
 	if none_check:
-		if (not id2) or (not id2):
+		if (not id1) or (not id2):
 			return False
 
 	if equality:
@@ -72,3 +72,11 @@ def hex_compare(id1, id2, equality=True, none_check=False, num_bytes=32):
 def distance_metric(origin, point):
 	point = (point[0]-origin[0], point[1]-origin[1])
 	return max(abs(point[0]), abs(point[1]))
+
+def distance_compare(origin, point1, point2):
+	d1 = distance_metric(origin, point1)
+	d2 = distance_metric(origin, point2)
+
+	if d1>=d2:
+		return True
+	return False

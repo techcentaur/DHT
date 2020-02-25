@@ -14,7 +14,8 @@ class Network():
 		x, y = net.get_new_coordinates()
 		node_hash = md5((str(x) + "+" + str(y)).encode()).hexdigest()
 
-		print("[*] Trying to add ".format(x, y))
+		print("{}".format("="*40))
+		print("[*] Trying to add {} | {}".format((x, y), node_hash))
 
 		net.P[x, y] = 1 # node alive
 		net.nodes[node_hash] = Node(node_hash, x, y)
@@ -23,18 +24,20 @@ class Network():
 		res = False
 		if A:
 			A_hash = md5((str(A[0]) + "+" + str(A[1])).encode()).hexdigest()
-			print(A_hash)
 			res = net.nodes[A_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
-			while True:
-				pass
 		else:
 			# first node in network
 			res = True
 			pass
+
+		# transmit state
+		net.nodes[node_hash].transmit_state()
+
 		if res:
 			print("[*] New node inserted @ ({},{})".format(x, y))
 			print("[#] Node properties: \n")
-			net.nodes[node_hash].print_tables()
+			for v, n in net.nodes.items():
+				n.print_tables()
 
 	def lookup(self, msg, key):
 		data = next(iter(net.nodes.values)).forward(LOOKUP_MESSAGE, key)

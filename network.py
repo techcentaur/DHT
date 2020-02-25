@@ -60,4 +60,4 @@ if __name__ == '__main__':
 	import sys
 	v = int(sys.argv[1])
 	n = Network(v)
-	n.add_nodes(3)
+	n.add_nodes(5)

@@ -146,30 +146,6 @@ class Node():
 				for i in range(len(self.L[0])-size-1, -1, -1):
 					self.L[0][i] = L[0][i+size]
 
-
-	def whatf(self, L, key):
-		leaves = [(hex_distance(key, self.hash_string), key)]
-
-		for i in L[0]:
-			if i:
-				leaves.append((hex_distance(i, self.hash_string), i))
-		for i in L[1]:
-			if i:
-				leaves.append((hex_distance(i, self.hash_string), i))
-
-		l0, l1 = [], []
-		for i in leaves:
-			if i[0][1] < 0:
-				l0.append(i)
-			else:
-				l1.append(i)
-
-		l0.sort(key=lambda x: x[0])
-		l1.sort(key=lambda x: x[0], reverse=True)
-
-		self.L[0][len(self.L[0])+len(l0)*-1:] = [x[1] for x in l0]
-		self.L[1][:len(l1)] = [x[1] for x in l1]
-
 	def transmit_state(self):
 		# to  M
 		for i in range(len(self.M)):
@@ -238,6 +214,7 @@ class Node():
 
 		# R
 		self.R[x][hex_map[new_key[x]]] = new_key
+		net.nodes[new_key].R[x][hex_map[self.hash_string[x]]] = self.hash_string
 
 	def minimal_key(self, key, __minx=-1, __miny=16, __minimal_key=None):
 		for i in range(len(self.L[0])-1, -1, -1):

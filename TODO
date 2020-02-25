@@ -1,7 +1,15 @@
 - code for updating entry for M when new join 
-and when casually called
-- routing tabel and M should update themselves as per with leaf sets
-- run this for mutliple nodes and debug
+and when casually called-----------------------
+- routing table and M should update themselves as per with leaf sets------------------------------------
+----------------
+whenever adding in R-i did it both ways
+----------------
+- run this for mutliple nodes and debug-----------------//
+
+- debug for insert and lookup
+
+
+
 - write the code for delete
 - debug as a whole
 - write the results graph code

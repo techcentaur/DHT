@@ -27,12 +27,15 @@ class Network():
 
 		if close_node:
 			close_hash = get_hash(str(close_node[0]) + "+" + str(close_node[1]))
-			net.debug()
 			net.nodes[close_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
 		else:
 			pass # first node in network
 
+		net.debug()
+		input()
 		net.nodes[node_hash].transmit_state()
+		net.debug()
+		input()
 
 
 	def lookup(self, key, msg=LOOKUP_MESSAGE):

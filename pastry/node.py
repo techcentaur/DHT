@@ -35,7 +35,7 @@ class Node():
 					p.append((i, x[i]))
 			if len(p) != 0:
 				print(idx, " -> ", p, end=' | ')
-		print("[#] Neighborhood Set:")
+		print("\n[#] Neighborhood Set:")
 		for i in self.M:
 			if i:
 				print(i, end=' ')
@@ -68,7 +68,9 @@ class Node():
 		return False
 
 	def update_R_entry(self, key):
-		x, y = hex_distance(key, self.node_id)
+		x = hex_different_index(key, self.node_id)
+		if x is -1:
+			return
 		if self.R[x][hex_map[key[x]]] is None:
 			self.R[x][hex_map[key[x]]] = key
 
@@ -77,8 +79,18 @@ class Node():
 		self.R[row] = data.copy()
 
 	def update_M(self, M, pos, key):
+		ins = (pos, key)
+		self.M = M.copy()
 
-		self.M = [(pos, key)] + M[1:]
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				tmp = self.M[i]
+				self.M[i] = ins
+				ins = tmp
+			else:
+				self.M[i] = ins
+				break
+
 		self.update_R_entry(key)
 
 	def update_L(self, L, key):
@@ -245,15 +257,13 @@ class Node():
 		return __minimal_key
 
 	def forward(self, msg, key, first_hop=False):
-		if msg==JOIN_MESSAGE: # for [A-Z] // send R
+		if msg==JOIN_MESSAGE:
 			x = hex_different_index(key, self.node_id)
 			net.nodes[key].update_R(x, self.R[x])
 			
 			if first_hop: # for A // send M
 				net.nodes[key].update_M(self.M, self.position, self.node_id)
-			res = self.__forward__(msg, key)
-			print(msg, key)
-			return res
+			return self.__forward__(msg, key)
 		else:
 			return self.__forward__(msg, key)
 

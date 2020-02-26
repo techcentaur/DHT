@@ -26,11 +26,6 @@ def expanding_ring_algorithm(tup, size):
 
 
 def hex_distance(id1, id2, absolute=False):
-	""" return (x, y)
-		at xth index i at which the character is different between strings
-		and y is the distance of xth characters (+ve when id1 > id2)
-	"""
-	
 	for i in range(32):
 		if id1[i] != id2[i]:
 			if absolute:
@@ -39,44 +34,29 @@ def hex_distance(id1, id2, absolute=False):
 	return (-1, -1)
 
 def hex_different_index(id1, id2):
-	"""return: the index of first different character in id1 and id2"""
-	
 	for i in range(32):
 		if id1[i] != id2[i]:
 			return i
 	return -1
 
 
-def hex_compare(id1, id2, equality=True, none_check=False):
+def hex_compare(id1, id2, equality=True):
 	"""check if id1 >= id2 if equality=True
 			 or id1 > id2 if equality=False
 	"""
-
-	# if none_check:
-	# 	if (id1 is None) or (id2 is None):
-	# 		return False
-
-	if equality:
-		if id1==id2:
+	if id1==id2:
+		if equality:
 			return True
-		for i in range(32):
-			if id1[i] != id2[i]:
-				d = hex_map[id1[i]] - hex_map[id2[i]]
-				if d >= 0:
-					return True
-				else:
-					return False
-	else:
-		if id1==id2:
-			return False
-		for i in range(32):
-			if id1[i] != id2[i]:
-				d = hex_map[id1[i]] - hex_map[id2[i]]
-				if d > 0:
-					return True
-				else:
-					return False
+		return False
 
+	for i in range(32):
+		if id1[i] != id2[i]:
+			d = hex_map[id1[i]] - hex_map[id2[i]]
+			if d > 0:
+				return True
+			else:
+				return False
+	
 def distance_metric(origin, point):
 	point = (point[0]-origin[0], point[1]-origin[1])
 	return max(abs(point[0]), abs(point[1]))

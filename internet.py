@@ -30,6 +30,12 @@ class Internet():
 					return p
 		return None
 
+	def alive(self, point):
+		self.P[point[0], point[1]] = 1
+
+	def debug(self):
+		for v, n in net.nodes.items():
+			n.print_tables()
 
 
 net = Internet()

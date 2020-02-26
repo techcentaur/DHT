@@ -4,82 +4,54 @@ from node import Node
 from internet import net # global object
 
 from constats import *
+from test import (do_tests, get_hash)
 
 
 class Network():
 	def __init__(self, v):
 		self.v = v
-		pass
 
 	def add_node(self):
 		x, y = net.get_new_coordinates()
-		node_hash = md5((str(x) + "+" + str(y)).encode()).hexdigest()
+		node_hash = get_hash(str(x) + "+" + str(y))
 
 		if self.v:
-			print("{}".format("="*40))
-			print("[*] Trying to add {} | {}".format((x, y), node_hash))
+			print("[!] Adding {} | {}".format((x, y), node_hash))
 
-		net.P[x, y] = 1 # node alive
-		net.nodes[node_hash] = Node(node_hash, x, y)
+		net.alive((x, y))
+		net.nodes[node_hash] = Node(node_hash, (x, y))
 
-		A = net.get_proximity_close_alive_node((x, y))
+		close_node = net.get_proximity_close_alive_node((x, y))
 		if self.v:
-			print("[*] Proximity node: ", A)
-		res = False
-		if A:
-			A_hash = md5((str(A[0]) + "+" + str(A[1])).encode()).hexdigest()
-			res = net.nodes[A_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
+			print("[*] Proximity node: ", close_node)
+
+		if close_node:
+			close_hash = get_hash(str(close_node[0]) + "+" + str(close_node[1]))
+			net.debug()
+			net.nodes[close_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
 		else:
-			# first node in network
-			res = True
-			pass
+			pass # first node in network
 
 		net.nodes[node_hash].transmit_state()
 
-		# if res:
-		# 	if self.v:
-		# 		print("[*] New node inserted @ ({},{})".format(x, y))
-		# 		print("[#] Node properties: \n")
-		# 		for v, n in net.nodes.items():
-		# 			n.print_tables()
 
 	def lookup(self, key, msg=LOOKUP_MESSAGE):
 		data = next(iter(net.nodes.values())).forward(msg, key)
-		print("[*] value is: ", data)
 		return data
 
 	def insert(self, msg, key):
+		print("everything works till here")
 		res = (next(iter(net.nodes.values()))).forward(msg, key)
-		if res:
-			print("[*] {}: {} // inserted successfully".format(key, msg))
 
 	def add_nodes(self, num=1):
 		for i in range(num):
 			self.add_node()
 
-def get_hash(string):
-	return md5(string.encode()).hexdigest()
-
-def get_random_file_msg(num):
-	stuff = []
-	for i in range(num):
-		stuff.append(("file {}".format(i), get_hash("key {}".format(i))))
-	return stuff
 
 if __name__ == '__main__':
-	import sys
-	v = int(sys.argv[1])
-	n = Network(v)
-	n.add_nodes(4)
+	verbose=1
+	n = Network(verbose)
+	do_tests(n, num_nodes=5, num_file_insert=5)
 
-	data = get_random_file_msg(5)
-	for d in data:
-		print("[##] Inserting: ", d)
-		n.insert(d[0], d[1])
 
-	# for v, n1 in net.nodes.items():
-	# 	n1.print_tables()
 
-	for d in data:
-		res = n.lookup(d[1])
-		print("LOOKUP: ", res, d[0])

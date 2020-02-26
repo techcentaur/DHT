@@ -1,53 +1,25 @@
-# class A:
-# 	def __init__(self):
-# 		self.val = 5
+from hashlib import md5
 
-# 	def f(self, b):
-# 		print(self.val)
+def get_hash(string):
+	return md5(string.encode()).hexdigest()
 
-# class B:
-# 	def f(self, a):
-# 		self.a = a
-# 		self.a.val = 6
+def get_random_file_msg(num):
+	stuff = []
+	for i in range(num):
+		stuff.append(("file {}".format(i), get_hash("key {}".format(i))))
+	return stuff
 
-# a = A()
-# print(a.val)
-# b = B()
-# b.f(a)
-# print(b.a.val)
-# print(a.val)
+def do_tests(n, num_nodes, num_file_insert):
+	n.add_nodes(num_nodes)
 
+	data = get_random_file_msg(num_file_insert)
+	for d in data:
+		print("[##] Inserting -> (msg, key): ", d)
+		n.insert(d[0], d[1])
 
-# import hashlib
-# from operator import itemgetter, attrgetter
-# S = []
-# s = "solanki is a bad boy duh"
-# for i in s.split():
-# 	S.append(hashlib.md5(i.encode()).hexdigest())
+	# for v, n1 in net.nodes.items():
+	# 	n1.print_tables()
 
-# print(S)
-
-# l=[(3,-2),(5,2), (4, -2), (5,9), (5,-10), (3,1)]
-# b = sorted(l, key=lambda x: x[1])
-# b = sorted(b, key=lambda x: x[0])
-# print(l)
-# print(b)
-
-# l = [[None, None, None], [None, None, None]]
-# for idx, j in enumerate(b):
-# 	if j[1] < 0:
-# 		for i in range(len(l[0])-1, -1, -1):
-# 			if l[0][i] is None:
-# 				l[0][i] = S[idx]
-# 				break
-# 	else:
-# 		for i in range(len(l[1])):
-# 			if l[1][i] is None:
-# 				l[1][i] = S[idx]
-# 				break
-
-# print(l)
-
-# class A:
-# 	def __a__(self):
-# 		print("A")
+	for d in data:
+		res = n.lookup(d[1])
+		print("[!] LOOKUP: {} -> {} | {}".format(d[1], res, res==d[0]))

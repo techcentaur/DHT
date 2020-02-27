@@ -10,10 +10,10 @@ class Node:
 			self.finger_table.append(successor)
 
 
-	def update_finger_table(self, chord, m):
+	def update_finger_table(self, chord):
 		self.finger_table = [].append(self.finger_table[0])	
 
-		for i in range(1, m):
+		for i in range(1, chord.m):
 			self.finger_table.append(chord.first_node.find_successor(self.node_id + (2**i)))
 
 	def find_successor(self, key):

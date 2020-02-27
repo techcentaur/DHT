@@ -36,7 +36,30 @@ class Chord:
 		return 1
 
 	def join(self, new_node):
-		pass
+		successor = self.get_node(self.first_node, new_node.id)
+
+		if successor.node_id = new_node.id:
+			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
+
+		for key in successor.HT:
+			d1 = dist(new_node.node_id, key)
+
+			if not (d1<0):
+				new_node.HT[key] = successor.HT[key]
+				del successor.HT[key]
+
+		tmp1 = successor.predecessor
+		new_node.finger_table[0] = successor
+		new_node.predecessor = tmp1
+
+		successor.predecessor = new_node
+		tmp1.finger_table[0] = new_node
+
+
+		new_node.update_finger_table(self)
+
+
+
 
 	def leave(self, new_node):
 		pass

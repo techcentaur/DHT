@@ -59,10 +59,20 @@ class Chord:
 		new_node.update_finger_table(self)
 
 
+	def leave(self, bye_node):
+		for key, value in bye_node.HT.items():
+			bye_node.finger_table[0].HT[key] = value
 
+		if bye_node.finger_table[0] = bye_node:
+			self.first_node = None
+		else:
+			bye_node.predecessor.finger_table[0] = bye_node.finger_table[0]
+			bye_node.finger_table[0].predecessor = bye_node.predecessor
 
-	def leave(self, new_node):
-		pass
+			if self.first_node = bye_node:
+				self.first_node = bye_node.finger_table[0]
+	
+
 
 
 

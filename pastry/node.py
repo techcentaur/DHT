@@ -45,13 +45,6 @@ class Node():
 			return True
 		return False
 
-	def update_R_entry(self, key):
-		x = hex_different_index(key, self.node_id)
-		if x is -1:
-			return
-		if self.R[x][hex_map[key[x]]] is None:
-			self.R[x][hex_map[key[x]]] = key
-
 	def update_R(self, r, R):
 
 		self.R[r] = R.copy()
@@ -64,14 +57,13 @@ class Node():
 			if self.M[i] is None:
 				self.M[i] = ins
 
-		_max = -1
-		_i = -1
+		_max, _i = -1, -1
 		for i in range(len(self.M)):
 			d = distance_metric(self.M[i][0], self.position)
 			if d > _max:
 				_max, _i = d, i
 
-		self.M[i] = ins
+		self.M[_i] = ins
 
 	def update_L(self, L, key):
 		if hex_compare(key, self.node_id):
@@ -131,8 +123,55 @@ class Node():
 			if self.Lmax[i] is not None:
 				net.nodes[self.Lmax[i]].update_presence(n, p)
 
-	def update_presence(self, key, pos=):
-		pass
+	def update_presence(self, key, pos):
+		# M
+		for i in range(len(self.M)):
+			if self.M[i] is None:
+				self.M[i] = (key, pos)
+
+		_max, _i = -1, -1
+		for i in range(len(self.M)):
+			d = distance_metric(self.M[i][0], self.position)
+			if d > _max:
+				_max, _i = d, i
+
+		d1 = distance_metric(self.M[_i][0], pos)
+		if d > d1:
+			self.M[_i] = (key, pos)
+
+		# R
+		idx = hex_different_index(key, self.node_id):
+		if self.R[idx][hex_map[key[idx]]] is None:
+			self.R[idx][hex_map[key[idx]]] = key
+
+		# L
+		if hex_compare(key, self.node_id):
+			for i in range(len(self.Lmax)):
+				if self.Lmax[i] is None:
+					self.Lmax[i] = key
+			x, y, j = -1, -1, -1
+			for i in range(len(self.Lmax)):
+				x1, y1 = hex_distance(self.Lmax[i], self.node_id)
+				if (x1 > x) or (x1==x and y1<y):
+					x, y, j = x1, y1, i
+			
+			x1, y1 = hex_distance(key, self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				self.Lmax[j] = key
+		else:
+			for i in range(len(self.Lmin)):
+				if self.Lmin[i] is None:
+					self.Lmin[i] = key
+			x, y, j = -1, -1, -1
+			for i in range(len(self.Lmin)):
+				x1, y1 = hex_distance(self.Lmin[i], self.node_id)
+				if (x1 > x) or (x1==x and y1<y):
+					x, y, j = x1, y1, i
+			
+			x1, y1 = hex_distance(key, self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				self.Lmin[j] = key
+
 
 	def minimal_key(self, key):
 		x, y = hex_distance(key, self.node_id)

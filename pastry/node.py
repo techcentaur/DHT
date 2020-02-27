@@ -53,6 +53,7 @@ class Node():
 			self.R[x][hex_map[key[x]]] = key
 
 	def update_R(self, r, R):
+
 		self.R[r] = R.copy()
 
 	def update_M(self, close_node):
@@ -71,7 +72,6 @@ class Node():
 				_max, _i = d, i
 
 		self.M[i] = ins
-
 
 	def update_L(self, L, key):
 		if hex_compare(key, self.node_id):
@@ -109,80 +109,30 @@ class Node():
 					self.L[0][i] = L[0][i+size]
 
 	def transmit_state(self):
-		# to  M
+		n = self.node_id
+		p = self.position
+		# M
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
-				net.nodes[self.M[i][1]].update_presence_of(self.node_id, self.position)
+				net.nodes[self.M[i][1]].update_presence(n, p)
 
-		# to R
+		# R
 		for i in range(len(self.R)):
 			for j in range(len(self.R[0])):
 				if self.R[i][j] is not None:
-					net.nodes[self.R[i][j]].update_presence_of(self.node_id, self.position)
-
-		# to L
-		for i in range(len(self.L[0])):
-			if self.L[0][i] is not None:
-				net.nodes[self.L[0][i]].update_presence_of(self.node_id, self.position)
-
-		for i in range(len(self.L[1])):
-			if self.L[1][i] is not None:
-				net.nodes[self.L[1][i]].update_presence_of(self.node_id, self.position)
-
-	def update_presence_of(self, new_key, new_pos):
-		if new_key==self.node_id:
-			return
-
-		(x, y) = hex_distance(new_key, self.node_id)
-
-		# M
-		if (new_pos, new_key) not in self.M:
-			for i in range(len(self.M)):
-				if self.M[i] is not None:
-					if distance_compare(self.position, self.M[i][0], new_pos):
-						tmp = (new_pos, new_key)
-						for j in range(i, len(self.M)):
-							tmp1 = self.M[j]
-							self.M[j] = tmp
-							tmp = tmp1
-						break
-				else:
-					self.M[i] = (new_pos, new_key)
-					break
+					net.nodes[self.R[i][j]].update_presence(n, p)
 
 		# L
-		if y>=0: # in L max
-			if new_key not in self.L[1]:
-				for i in range(len(self.L[1])):
-					if self.L[1][i] is not None:
-						if hex_compare(self.L[1][i], new_key, equality=False):
-							tmp = new_key
-							for j in range(i, len(self.L[1])):
-								tmp1 = self.L[1][j]
-								self.L[1][j] =  tmp
-								tmp = tmp1
-							break
-					else:
-						self.L[1][i] = new_key
-						break
-		else: # in L min
-			if new_key not in self.L[0]:
-				for i in range(len(self.L[0])-1, -1, -1):
-					if self.L[0][i] is not None:
-						if hex_compare(new_key, self.L[0][i], equality=False):
-							tmp = new_key
-							for j in range(i, -1, -1):
-								tmp1 = self.L[0][j]
-								self.L[0][j] = tmp
-								tmp = tmp1		
-							break
-					else:
-						self.L[0][i] = new_key
-						break
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				net.nodes[self.Lmin[i]].update_presence(n, p)
 
-		# R
-		self.R[x][hex_map[new_key[x]]] = new_key
-		net.nodes[new_key].R[x][hex_map[self.node_id[x]]] = self.node_id
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				net.nodes[self.Lmax[i]].update_presence(n, p)
+
+	def update_presence(self, key, pos=):
+		pass
 
 	def minimal_key(self, key):
 		x, y = hex_distance(key, self.node_id)

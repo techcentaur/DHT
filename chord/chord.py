@@ -30,15 +30,30 @@ class Chord:
 	def get_hash(self, key):
 		return key % self.num_nodes
 
-	def find_successor(self, key):
+	def find_successor(self, key, verbose=False):
 		__key = self.get_hash(key)
 		pointer = self.first_node
 
+		# if verbose:
+		# 	print(": {}".format(pointer.node_id), end='')
+		first=True
 		while True:
+			if verbose:
+				if first:
+					first=False
+					print(": {}".format(pointer.node_id), end='')
+				else:
+					print("-> {}".format(pointer.node_id), end='')
 			if pointer.node_id is __key:
+				if verbose:
+					print("-> {}".format(pointer.node_id), end='')
 				return pointer
+
 			if self.dist(pointer.node_id, __key) <= self.dist(pointer.finger_table[0].node_id, __key):
+				if verbose:
+					print("-> {}".format(pointer.finger_table[0].node_id), end='')
 				return pointer.finger_table[0]
+			
 			__node = pointer.finger_table[-1]
 
 			i = 0
@@ -94,6 +109,27 @@ class Chord:
 			if self.first_node == bye_node:
 				self.first_node = bye_node.finger_table[0]
 	
+	def leave_node_by_key(self, key):
+		res = self.find_node_by_key(key)
+		if res == -1:
+			return 
+		else:
+			self.leave(res)
+			print("[*] removed successfully")
+
+
+	def find_node_by_key(self, key):
+		if key==self.first_node.node_id:
+			return self.first_node
+
+		__next = self.first_node.finger_table[0]
+		while __next != self.first_node:
+			if key==__next.node_id:
+				return __next
+			__next = __next.finger_table[0]
+
+		print("[?] Node ID {} doesn't exist!".format(key))
+		return -1
 
 	def fix_fingers(self):
 		self.first_node.update_finger_table(self)

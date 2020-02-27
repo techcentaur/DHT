@@ -18,18 +18,29 @@ from node import Node
 m = 10
 chord = Chord(m)
 
-for i in range(1000):
-	__id = random.randint(0, 10240)
+for i in range(10):
+	__id = random.randint(0, 10240) % 2**10
 	print("[*] Adding node | id -> {}".format(__id))
 	chord.join(Node(__id, m))
 
 chord.fix_fingers()
+
+keys = []
+for i in range(1, 5):
+	print("[.] Inserting file: file{}".format(i))
+	key = random.randint(0, 2**10)
+	chord.insert(key, "file{}".format(i))
+	keys.append(key)
+
 chord.print()
+l = int(input())
 
+chord.leave_node_by_key(l)
+chord.fix_fingers()
+chord.print()
+input()
 
+for i in range(1, 5):
+	val = chord.lookup(keys[i-1], True)
+	print("\n{}->{}".format(keys[i-1], val))
 
-# for i in range(1, 5):
-# 	chord.insert(i, "file{}".format(i))
-
-# for i in range(1, 5)
-# 	chord.lookup(i, True)

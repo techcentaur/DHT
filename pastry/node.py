@@ -65,40 +65,37 @@ class Node():
 
 		self.M[_i] = ins
 
-	def update_L(self, L, key):
-		if hex_compare(key, self.node_id):
-			self.update_R_entry(key)
+	def update_L(self, Lmin, Lmax, key):
+		self.Lmin = Lmin.copy()
+		self.Lmax = Lmax.copy()
 
-			big = [key]
-			for i in range(len(L[0])-1, -1, -1):
-				if L[0][i]:
-					if hex_compare(L[0][i], self.node_id):
-						big.append(L[0][i])
-					else:
-						self.L[0][len(self.L[0])-i:] = L[0][:i]
-			big.reverse()
-			size = len(big)
-			if size >= len(self.L[1]):
-				self.L[1]=big[:len(self.L[1])]
-			else:
-				self.L[1][:size] = big[:]
-				for i in range(size, len(self.L[1])):
-					self.L[1][i] = L[1][i-size]
+		if hex_compare(key, self.node_id):
+			for i in range(len(self.Lmax)):
+				if self.Lmax[i] is None:
+					self.Lmax[i] = key
+			x, y, j = -1, -1, -1
+			for i in range(len(self.Lmax)):
+				x1, y1 = hex_distance(self.Lmax[i], self.node_id)
+				if (x1 > x) or (x1==x and y1<y):
+					x, y, j = x1, y1, i
+			
+			x1, y1 = hex_distance(key, self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				self.Lmax[j] = key
 		else:
-			less = [key]
-			for i in range(len(L[1])):
-				if L[1][i]:
-					if hex_compare(self.node_id, L[1][i]):
-						less.append(L[1][i])
-					else:
-						self.L[1][:len(self.L[1])-i] = L[1][i:]
-			size = len(less)
-			if size >= len(self.L[1]):
-				self.L[0]=less[size-len(self.L[1]):]
-			else:
-				self.L[0][len(self.L[0])-size:] = less[:]
-				for i in range(len(self.L[0])-size-1, -1, -1):
-					self.L[0][i] = L[0][i+size]
+			for i in range(len(self.Lmin)):
+				if self.Lmin[i] is None:
+					self.Lmin[i] = key
+			x, y, j = -1, -1, -1
+			for i in range(len(self.Lmin)):
+				x1, y1 = hex_distance(self.Lmin[i], self.node_id)
+				if (x1 > x) or (x1==x and y1<y):
+					x, y, j = x1, y1, i
+			
+			x1, y1 = hex_distance(key, self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				self.Lmin[j] = key
+
 
 	def transmit_state(self):
 		n = self.node_id
@@ -235,7 +232,7 @@ class Node():
 
 	def deliver(self, msg, key):
 		if msg == JOIN_MESSAGE:
-			net.nodes[key].update_L(self.L, self.node_id)
+			net.nodes[key].update_L(self.Lmin, self.Lmax, self.node_id)
 			return 1
 		elif msg==LOOKUP_MESSAGE:
 			return self.HT[key]

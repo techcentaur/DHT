@@ -14,7 +14,6 @@ def hex_different_index(id1, id2):
 			return i
 	return -1
 
-
 def hex_compare(id1, id2, equality=True):
 	"""check if id1 >= id2 if equality=True
 			 or id1 > id2 if equality=False
@@ -32,8 +31,8 @@ def hex_compare(id1, id2, equality=True):
 			else:
 				return False
 	
-def distance_metric(origin, point):
-	point = (point[0]-origin[0], point[1]-origin[1])
+def distance_metric(point1, point2):
+	point = (point2[0]-point1[0], point2[1]-point1[1])
 	return max(abs(point[0]), abs(point[1]))
 
 def distance_compare(origin, point1, point2):

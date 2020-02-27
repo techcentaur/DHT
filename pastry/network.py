@@ -27,7 +27,8 @@ class Network():
 
 		if close_node:
 			close_hash = get_hash(str(close_node[0]) + "+" + str(close_node[1]))
-			net.nodes[close_hash].forward(JOIN_MESSAGE, node_hash, first_hop=True)
+			net.nodes[net].update_M(net.nodes[close_hash])
+			net.nodes[close_hash].forward(JOIN_MESSAGE, node_hash)
 		else:
 			pass # first node in network
 

@@ -184,63 +184,28 @@ class Node():
 		self.R[x][hex_map[new_key[x]]] = new_key
 		net.nodes[new_key].R[x][hex_map[self.node_id[x]]] = self.node_id
 
-	def minimal_key(self, key, __minx=-1, __miny=16, __minimal_key=None):
-		for i in range(len(self.L[0])-1, -1, -1):
-			if self.L[0][i]:
-				x, y = hex_distance(key, self.L[0][i], absolute=True)
-				if x == -1:
-					return self.L[0][i]
-				if (x > __minx) or ((x == __minx) and (y < __miny)):
-					__minx, __miny = x, y
-					__minimal_key = self.L[0][i]
+	def minimal_key(self, key):
+		x, y = hex_distance(key, self.node_id)
+		k = self.node_id
 
-		for i in range(len(self.L[1])):
-			if self.L[1][i]:
-				x, y = hex_distance(key, self.L[1][i], absolute=True)
-				if x == -1:
-					return self.L[1][i]
-				if (x > __minx) or ((x == __minx) and (y < __miny)):
-					__minx, __miny = x, y
-					__minimal_key = self.L[1][i]
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				a, b = hex_distance(self.Lmin[i], key)
+				if (a > x) and (a==x and b < y):
+					a, b = x, y
+					k = self.Lmin[i]
 
-			
-		x, y = hex_distance(self.node_id, key, absolute=True)
-		if x is -1:
-			return self.node_id
-		if (x > __minx) or ((x == __minx) and (y < __miny)):
-			__minx, __miny = x, y
-			__minimal_key = self.node_id
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				a, b = hex_distance(self.Lmax[i], key)
+				if (a > x) and (a==x and b < y):
+					a, b = x, y
+					k = self.Lmax[i]
+		return k
 
-		return __minimal_key
+	def all_minimal_key(self, key):
 
-	def all_set_minimal(self, key, __minx=-1, __miny=16, __minimal_key=None):
-		for i in range(__minx, len(self.R)):
-			for j in range(len(self.R[0])):
-				if self.R[i][j]:
-					x, y = hex_distance(key, self.R[i][j], absolute=True)
-					if x is -1:
-						return self.R[i][j]
-					if (x > __minx) or (x==__minx and y < __miny):
-						__minx, __miny = x, y
-						__minimal_key = self.R[i][j]
 
-		for i in range(len(self.M)):
-			if self.M[i]:
-				x, y = hex_distance(key, self.M[i][1])
-				if x is -1:
-					return self.M[i][1]
-				if x > __minx or (x==__minx and y < __miny):
-					__minx, __miny = x, y
-					__minimal_key = self.M[i][1]
-
-		__minimal_key = self.minimal_key(key, __minx, __miny, __minimal_key)
-		return __minimal_key
-
-	def forward(self, msg, key, first_hop=False):
-		if msg==JOIN_MESSAGE:
-			x = hex_different_index(key, self.node_id)
-			net.nodes[key].update_R(x, self.R[x])
-		return self.__forward__(msg, key)
 
 	def deliver(self, msg, key):
 		if msg == JOIN_MESSAGE:
@@ -252,6 +217,11 @@ class Node():
 			self.HT[key] = msg
 			return 1
 
+	def forward(self, msg, key):
+		if msg==JOIN_MESSAGE:
+			x = hex_different_index(key, self.node_id)
+			net.nodes[key].update_R(x, self.R[x])
+		return self.__forward__(msg, key)
 
 	def __forward__(self, msg, key):
 		if self.in_leaf_set(key):

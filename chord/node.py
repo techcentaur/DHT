@@ -14,8 +14,7 @@ class Node:
 		self.finger_table = [].append(self.finger_table[0])	
 
 		for i in range(1, m):
-			self.finger_table.append(self.find_successor(chord.first_node, self.node_id + (2**i)))
-			# is this right?
+			self.finger_table.append(chord.first_node.find_successor(self.node_id + (2**i)))
 
 	def find_successor(self, key):
 		if (dist(key, self.node_id) > 0) and (dist(self.finger_table[0], key) >= 0):

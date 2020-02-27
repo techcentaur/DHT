@@ -191,20 +191,57 @@ class Node():
 		for i in range(len(self.Lmin)):
 			if self.Lmin[i] is not None:
 				a, b = hex_distance(self.Lmin[i], key)
-				if (a > x) and (a==x and b < y):
-					a, b = x, y
+				if (a > x) or (a==x and b < y):
+					x, y = a, b
 					k = self.Lmin[i]
 
 		for i in range(len(self.Lmax)):
 			if self.Lmax[i] is not None:
 				a, b = hex_distance(self.Lmax[i], key)
-				if (a > x) and (a==x and b < y):
-					a, b = x, y
+				if (a > x) or (a==x and b < y):
+					x, y = a, b
 					k = self.Lmax[i]
 		return k
 
-	def all_minimal_key(self, key):
+	@staticmethod
+	def __condition__(T, K, I, nodeId):
+		j = hex_different_index(T, K)
+		a, b = hex_distance(T, K)
+		x, y = hex_distance(nodeId, K)
 
+		if (j>=I) and ((a > x) or (a==x and b < y)):
+			return True
+		else False
+
+
+	def all_minimal_key(self, key):
+		i = hex_different_index(key, self.node_id)
+
+		# L
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				if self.__condition__(self.Lmin[i], key, i, self.node_id):
+					return self.Lmin[i]
+
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				if self.__condition__(self.Lmax[i], key, i, self.node_id):
+					return self.Lmax[i]
+
+		# R
+		for i in range(self.R):
+			for j in range(self.R[0]):
+				if self.R[i][j] is not None:
+					if self.__condition__(self.R[i][j], key, i, self.node_id):
+						return self.R[i][j]
+
+		# M
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				if self.__condition__(self.M[i][1], key, i, self.node_id):
+					return self.M[i][1]
+
+		return self.node_id
 
 
 	def deliver(self, msg, key):

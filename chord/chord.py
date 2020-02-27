@@ -6,26 +6,30 @@ class Chord:
 		self.m = m
 		self.num_nodes = 2**m
 
-		self.first_node = Node(0, predecessor=-1)
+		self.first_node = Node(0, m, predecessor=-1)
 		self.first_node.finger_table[0] = self.first_node
-		self.first_node.update_finger_table(self.m, self.first_node)
+		self.first_node.update_finger_table(self.first_node)
 
 	def lookup(self, key, verbose=False):	
 		print("Look up {}".format(key), end='')
-		__node = self.first_node.find_successor(key, verbose)
+		__node = self.find_successor(key, verbose)
 		if key in __node.HT:
 			return __node.HT[key]
 		return -1
 
+	def find_successor():
+		"""wrapper"""
+		return self.first_node.find_successor(key, self.m)
+
 	def insert(self, key, value):
-		__node = self.first_node.find_successor(key)
+		__node = self.find_successor(key)
 		__node.HT[key] = value
 		return 1
 
 	def join(self, new_node):
-		successor = self.first_node.find_successor(new_node.id)
+		successor = self.find_successor(new_node.id)
 
-		if successor.node_id = new_node.id:
+		if successor.node_id == new_node.id:
 			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
 
 		for key in successor.HT:
@@ -50,13 +54,13 @@ class Chord:
 		for key, value in bye_node.HT.items():
 			bye_node.finger_table[0].HT[key] = value
 
-		if bye_node.finger_table[0] = bye_node:
+		if bye_node.finger_table[0] == bye_node:
 			self.first_node = None
 		else:
 			bye_node.predecessor.finger_table[0] = bye_node.finger_table[0]
 			bye_node.finger_table[0].predecessor = bye_node.predecessor
 
-			if self.first_node = bye_node:
+			if self.first_node == bye_node:
 				self.first_node = bye_node.finger_table[0]
 	
 

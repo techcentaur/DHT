@@ -18,9 +18,9 @@ from chord import Chord
 m = 6
 chord = Chord(m)
 
-for i in range(10):
-	__id = random.randint(0, 100):
-	chord.join(Node(__id))
+# for i in range(1):
+# 	__id = random.randint(0, 100)
+# 	chord.join(Node(__id, m))
 
 chord.print()
 

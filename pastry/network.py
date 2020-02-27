@@ -31,11 +31,7 @@ class Network():
 		else:
 			pass # first node in network
 
-		net.debug()
-		input()
 		net.nodes[node_hash].transmit_state()
-		net.debug()
-		input()
 
 
 	def lookup(self, key, msg=LOOKUP_MESSAGE):
@@ -43,7 +39,6 @@ class Network():
 		return data
 
 	def insert(self, msg, key):
-		print("everything works till here")
 		res = (next(iter(net.nodes.values()))).forward(msg, key)
 
 	def add_nodes(self, num=1):
@@ -52,9 +47,8 @@ class Network():
 
 
 if __name__ == '__main__':
-	verbose=1
-	n = Network(verbose)
-	do_tests(n, num_nodes=5, num_file_insert=5)
+	n = Network(verbose=True)
+	do_tests(n, num_nodes=1, num_file_insert=5)
 
 
 

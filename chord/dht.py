@@ -22,5 +22,13 @@ for i in range(10):
 	__id = random.randint(0, 100):
 	chord.join(Node(__id))
 
-chord.fix_fingers()
+chord.print()
 
+# chord.fix_fingers()
+
+
+# for i in range(1, 5):
+# 	chord.insert(i, "file{}".format(i))
+
+# for i in range(1, 5)
+# 	chord.lookup(i, True)

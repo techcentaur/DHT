@@ -10,8 +10,9 @@ class Chord:
 		self.first_node.finger_table[0] = self.first_node
 		self.first_node.update_finger_table(self.m, self.first_node)
 
-	def lookup(self, key):	
-		__node = self.first_node.find_successor(key)
+	def lookup(self, key, verbose=False):	
+		print("Look up {}".format(key), end='')
+		__node = self.first_node.find_successor(key, verbose)
 		if key in __node.HT:
 			return __node.HT[key]
 		return -1
@@ -67,6 +68,13 @@ class Chord:
 			__next.update_finger_table(self.m, self.first_node)
 			__next = __next.finger_table[0]
 
+	def print(self):
+		self.first_node.print()
+
+		__next = self.first_node.finger_table[0]
+		while __next != self.first_node:
+			__next.print()
+			__next = __next.finger_table[0]
 
 
 

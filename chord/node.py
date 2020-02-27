@@ -8,7 +8,6 @@ class Node:
 		self.predecessor = predecessor
 		self.finger_table = [successor]
 
-
 	def update_finger_table(self, m, first_node):
 		for i in range(1, m):
 			if i < len(self.finger_table):
@@ -16,11 +15,17 @@ class Node:
 			else:
 				self.finger_table.append(first_node.find_successor(self.node_id + (2**i)))
 
-	def find_successor(self, key):
+	def find_successor(self, key, verbose=False):
 		if (dist(key, self.node_id) > 0) and (dist(self.finger_table[0], key) >= 0):
+			if verbose:
+				print(": {}".format(self.finger_table[0]), end='')
+			
 			return self.finger_table[0]
 		else:
 			__n = self.closest_preceding_node(key)
+			if verbose:
+				print("-> {}".format(self.finger_table[0]), end='')
+
 			return __n.find_successor(key)
 
 	def closest_preceding_node(self, key):
@@ -28,3 +33,11 @@ class Node:
 			if (dist(self.finger_table[i].node_id, n) > 0) and (dist(key, self.finger_table[i].node_id) < 0):
 				return self.finger_table[i]
 		return self			
+
+
+	def print(self):
+		print("[.] ID: ", self.node_id)
+		print("[.] predecessor: ", self.predecessor)
+		print("[.] Finger table: ", self.finger_table)
+		print("[.] Data: ", self.HT)
+		print("[=]"*30)

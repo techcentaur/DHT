@@ -15,12 +15,12 @@ from node import Node
 # 	return hashlib.md5(string.encode()).hexdigest()
 
 
-m = 6
+m = 10
 chord = Chord(m)
 
-for i in range(2):
-	__id = random.randint(0, 100)
-	print("Adding node id: {}".format(__id))
+for i in range(1000):
+	__id = random.randint(0, 10240)
+	print("[*] Adding node | id -> {}".format(__id))
 	chord.join(Node(__id, m))
 
 chord.fix_fingers()

@@ -10,7 +10,15 @@ class Chord:
 		self.first_node.predecessor = self.first_node
 		self.first_node.finger_table[0] = self.first_node
 		
-		self.first_node.update_finger_table(self.first_node)
+		self.first_node.update_finger_table(self)
+
+	def dist(self, id1, id2):
+		if id1==id2:
+			return 0
+		if id1 < id2:
+			return id2-id1
+		return self.num_nodes - id1 + id2
+
 
 	def lookup(self, key, verbose=False):	
 		print("Look up {}".format(key), end='')
@@ -19,9 +27,28 @@ class Chord:
 			return __node.HT[key]
 		return -1
 
+	def get_hash(self, key):
+		return key % self.num_nodes
+
 	def find_successor(self, key):
-		"""wrapper"""
-		return self.first_node.find_successor(key)
+		__key = self.get_hash(key)
+		pointer = self.first_node
+
+		while True:
+			if pointer.node_id is __key:
+				return pointer
+			if self.dist(pointer.node_id, __key) <= self.dist(pointer.finger_table[0].node_id, __key):
+				return pointer.finger_table[0]
+			__node = pointer.finger_table[-1]
+
+			i = 0
+			bound = len(pointer.finger_table)-1
+			while i < bound:
+				if self.dist(pointer.finger_table[i].node_id, __key) < self.dist(pointer.finger_table[i+1].node_id, __key):
+					__node = pointer.finger_table[i]
+				i += 1
+
+			pointer = __node
 
 	def insert(self, key, value):
 		__node = self.find_successor(key)
@@ -36,24 +63,22 @@ class Chord:
 			return
 
 		for key in successor.HT:
-			d1 = dist(new_node.node_id, key)
+			d1 = self.dist(new_node.node_id, k)
 
 			if not (d1<0):
 				new_node.HT[key] = successor.HT[key]
 				del successor.HT[key]
 
-		print(new_node.node_id, successor.node_id)
-		
+		# stabilization		
 		tmp1 = successor.predecessor
 		new_node.finger_table[0] = successor
 		new_node.predecessor = tmp1
 
+		# notify
 		successor.predecessor = new_node
-		if tmp1 is not -1:
-			tmp1.finger_table[0] = new_node
+		tmp1.finger_table[0] = new_node
 
-
-		new_node.update_finger_table(self.first_node)
+		new_node.update_finger_table(self)
 
 
 	def leave(self, bye_node):
@@ -71,11 +96,11 @@ class Chord:
 	
 
 	def fix_fingers(self):
-		self.first_node.update_finger_table(self.first_node)
+		self.first_node.update_finger_table(self)
 
 		__next = self.first_node.finger_table[0]
 		while __next != self.first_node:
-			__next.update_finger_table(self.first_node)
+			__next.update_finger_table(self)
 			__next = __next.finger_table[0]
 
 	def print(self):

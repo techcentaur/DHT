@@ -16,7 +16,9 @@ class Internet():
 		return x, y
 
 	def ping(self, x, y):
-		return self.P[x % N , y % N]
+		if (x >= 0 and x < N) and (y>=0 and y<N):
+			return self.P[x, y]
+		return False
 
 	def get_proximity_close_alive_node(self, tup):
 		x, y = tup[0], tup[1]

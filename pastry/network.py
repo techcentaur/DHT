@@ -27,11 +27,12 @@ class Network():
 
 		if close_node:
 			close_hash = get_hash(str(close_node[0]) + "+" + str(close_node[1]))
-			net.nodes[net].update_M(net.nodes[close_hash])
+			net.nodes[node_hash].update_M(net.nodes[close_hash])
 			net.nodes[close_hash].forward(JOIN_MESSAGE, node_hash)
 		else:
 			pass # first node in network
 
+		# net.nodes[node_hash].print()
 		net.nodes[node_hash].transmit_state()
 
 
@@ -48,8 +49,8 @@ class Network():
 
 
 if __name__ == '__main__':
-	n = Network(verbose=True)
-	do_tests(n, num_nodes=1, num_file_insert=5)
+	n = Network(v=True)
+	do_tests(n, num_nodes=2, num_file_insert=5)
 
 
 

@@ -9,17 +9,19 @@ class Node():
 	def __init__(self, node_id, position):
 		self.node_id = node_id
 		self.position = position
-		self.R = [None for j in range(pow(2, b)) for i in range(hash_size)]
+		self.R = [[None for j in range(pow(2, b))] for i in range(hash_size)]
 		self.M = [None for x in range(pow(2, b+1))]
 		self.Lmin = [None for x in range(pow(2, b-1))]
 		self.Lmax = [None for x in range(pow(2, b-1))] 
 		self.HT = {}
 
-	def print_tables(self):
+	def print(self):
 		print("{}".format("-"*40))
 		print("[.] Node id: {} | Position {}".format(self.node_id, self.position))
-		print("[#] Routing Table:", self.R)
-		print("[#] Neighborhood Set:", self.M)
+		print("[#] Routing Table:")
+		for i in self.R:
+			print(i)
+		print("[#] Neighborhood Set:", self.M)	
 		print("[#] Leaf Set Min:", self.Lmin)
 		print("[#] Leaf Set Max:", self.Lmax)
 		print("[*] Data: {}".format(self.HT))
@@ -56,6 +58,7 @@ class Node():
 		for i in range(len(self.M)):
 			if self.M[i] is None:
 				self.M[i] = ins
+				return
 
 		_max, _i = -1, -1
 		for i in range(len(self.M)):
@@ -73,6 +76,8 @@ class Node():
 			for i in range(len(self.Lmax)):
 				if self.Lmax[i] is None:
 					self.Lmax[i] = key
+					return
+
 			x, y, j = -1, -1, -1
 			for i in range(len(self.Lmax)):
 				x1, y1 = hex_distance(self.Lmax[i], self.node_id)
@@ -86,6 +91,8 @@ class Node():
 			for i in range(len(self.Lmin)):
 				if self.Lmin[i] is None:
 					self.Lmin[i] = key
+					return
+
 			x, y, j = -1, -1, -1
 			for i in range(len(self.Lmin)):
 				x1, y1 = hex_distance(self.Lmin[i], self.node_id)
@@ -120,11 +127,11 @@ class Node():
 			if self.Lmax[i] is not None:
 				net.nodes[self.Lmax[i]].update_presence(n, p)
 
-	def update_presence(self, key, pos):
-		# M
+	def __update__M(self, key, pos):
 		for i in range(len(self.M)):
 			if self.M[i] is None:
-				self.M[i] = (key, pos)
+				self.M[i] = (pos, key)
+				return
 
 		_max, _i = -1, -1
 		for i in range(len(self.M)):
@@ -134,40 +141,59 @@ class Node():
 
 		d1 = distance_metric(self.M[_i][0], pos)
 		if d > d1:
-			self.M[_i] = (key, pos)
+			self.M[_i] = (pos, key)
+
+
+	def __update__Lmax(self, key, pos):
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is None:
+				self.Lmax[i] = key
+				return
+		x, y, j = -1, -1, -1
+		for i in range(len(self.Lmax)):
+			x1, y1 = hex_distance(self.Lmax[i], self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				x, y, j = x1, y1, i
+		
+		x1, y1 = hex_distance(key, self.node_id)
+		if (x1 > x) or (x1==x and y1<y):
+			self.Lmax[j] = key
+
+	def __update__Lmin(self, key, pos):
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is None:
+				self.Lmin[i] = key
+				return
+		x, y, j = -1, -1, -1
+		for i in range(len(self.Lmin)):
+			x1, y1 = hex_distance(self.Lmin[i], self.node_id)
+			if (x1 > x) or (x1==x and y1<y):
+				x, y, j = x1, y1, i
+		
+		x1, y1 = hex_distance(key, self.node_id)
+		if (x1 > x) or (x1==x and y1<y):
+			self.Lmin[j] = key
+
+
+	def update_presence(self, key, pos):
+		# M
+		if (pos, key) not in self.M:
+			self.__update__M(key, pos)
 
 		# R
-		idx = hex_different_index(key, self.node_id):
+		idx = hex_different_index(key, self.node_id)
 		if self.R[idx][hex_map[key[idx]]] is None:
 			self.R[idx][hex_map[key[idx]]] = key
+		if net.nodes[key].R[idx][hex_map[self.node_id[idx]]] is None:
+			net.nodes[key].R[idx][hex_map[self.node_id[idx]]] = self.node_id
 
 		# L
 		if hex_compare(key, self.node_id):
-			for i in range(len(self.Lmax)):
-				if self.Lmax[i] is None:
-					self.Lmax[i] = key
-			x, y, j = -1, -1, -1
-			for i in range(len(self.Lmax)):
-				x1, y1 = hex_distance(self.Lmax[i], self.node_id)
-				if (x1 > x) or (x1==x and y1<y):
-					x, y, j = x1, y1, i
-			
-			x1, y1 = hex_distance(key, self.node_id)
-			if (x1 > x) or (x1==x and y1<y):
-				self.Lmax[j] = key
+			if key not in self.Lmax:
+				self.__update__Lmax(key, pos)
 		else:
-			for i in range(len(self.Lmin)):
-				if self.Lmin[i] is None:
-					self.Lmin[i] = key
-			x, y, j = -1, -1, -1
-			for i in range(len(self.Lmin)):
-				x1, y1 = hex_distance(self.Lmin[i], self.node_id)
-				if (x1 > x) or (x1==x and y1<y):
-					x, y, j = x1, y1, i
-			
-			x1, y1 = hex_distance(key, self.node_id)
-			if (x1 > x) or (x1==x and y1<y):
-				self.Lmin[j] = key
+			if key not in self.Lmin:
+				self.__update__Lmin(key, pos)
 
 
 	def minimal_key(self, key):
@@ -197,7 +223,7 @@ class Node():
 
 		if (j>=I) and ((a > x) or (a==x and b < y)):
 			return True
-		else False
+		return False
 
 
 	def all_minimal_key(self, key):
@@ -214,18 +240,18 @@ class Node():
 				if self.__condition__(self.Lmax[i], key, i, self.node_id):
 					return self.Lmax[i]
 
-		# R
-		for i in range(self.R):
-			for j in range(self.R[0]):
-				if self.R[i][j] is not None:
-					if self.__condition__(self.R[i][j], key, i, self.node_id):
-						return self.R[i][j]
-
 		# M
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
 				if self.__condition__(self.M[i][1], key, i, self.node_id):
 					return self.M[i][1]
+
+		# R
+		for i in range(len(self.R)):
+			for j in range(len(self.R[0])):
+				if self.R[i][j] is not None:
+					if self.__condition__(self.R[i][j], key, i, self.node_id):
+						return self.R[i][j]
 
 		return self.node_id
 
@@ -250,7 +276,7 @@ class Node():
 		if self.in_leaf_set(key):
 			k = self.minimal_key(key)
 			if k == self.node_id:
-				return deliver(msg, key)
+				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 		else:
 			i = hex_different_index(key, self.node_id)
@@ -261,7 +287,7 @@ class Node():
 
 			k = self.all_minimal_key(key)
 			if k == self.node_id:
-				return deliver(msg, key)
+				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 
 		print("**************this can't possible print")

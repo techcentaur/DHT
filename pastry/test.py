@@ -1,7 +1,8 @@
 from hashlib import md5
+from internet import net
 
 def get_hash(string):
-	return md5(string.encode()).hexdigest()
+	return md5(string.encode()).hexdigest()[:8]
 
 def get_random_file_msg(num):
 	stuff = []
@@ -12,7 +13,7 @@ def get_random_file_msg(num):
 def do_tests(n, num_nodes, num_file_insert):
 	n.add_nodes(num_nodes)
 	for v, n1 in net.nodes.items():
-		n1.print_tables()
+		n1.print()
 
 	# data = get_random_file_msg(num_file_insert)
 	# for d in data:

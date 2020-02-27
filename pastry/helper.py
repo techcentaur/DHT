@@ -1,13 +1,17 @@
-hex_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
+from constats import *
+
+# hex_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'a': 10, 'b': 11, 'c': 12, 'd': 13, 'e': 14, 'f': 15}
+hex_map = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 0, '9': 1, 'a': 2, 'b': 3, 'c': 4, 'd': 5, 'e': 6, 'f': 7}
+
 
 def hex_distance(id1, id2):
-	for i in range(32):
+	for i in range(hash_size):
 		if id1[i] != id2[i]:
 			return i, abs(hex_map[id1[i]]-hex_map[id2[i]])
-	return 32, 0
+	return hash_size, 0
 
 def hex_different_index(id1, id2):
-	for i in range(32):
+	for i in range(hash_size):
 		if id1[i] != id2[i]:
 			return i
 	return -1
@@ -21,7 +25,7 @@ def hex_compare(id1, id2, equality=True):
 			return True
 		return False
 
-	for i in range(32):
+	for i in range(hash_size):
 		if id1[i] != id2[i]:
 			d = hex_map[id1[i]] - hex_map[id2[i]]
 			if d > 0:

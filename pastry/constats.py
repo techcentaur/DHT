@@ -1,6 +1,6 @@
-b = 2
-N = 1000
-hash_size = 32
+b = 3
+N = 10
+hash_size = 8
 
 JOIN_MESSAGE = "JOIN_PASTRY"
 LOOKUP_MESSAGE = "LOOKUP_DATA_PASTRY"

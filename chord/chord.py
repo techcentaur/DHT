@@ -1,42 +1,28 @@
 from node import Node
-
-
-def dist(id1, id2):
-	"""id1 and id2 are integers"""
-	return id1-id2
+from helper import *
 
 class Chord:
 	def __init__(self, m):
-		# chord init and first node
 		self.m = m
-		self.num_nodes = 2 ** m
+		self.num_nodes = 2**m
 
-		self.first_node = Node(0)
+		self.first_node = Node(0, predecessor=-1)
 		self.first_node.finger_table[0] = self.first_node
-
-		self.first_node.predecessor = -1
-		self.first_node.update_finger_table(self, self.m)
-
-
-	def get_node(self, first_node, key):
-		return first_node.find_successor(key)
+		self.first_node.update_finger_table(self.m, self.first_node)
 
 	def lookup(self, key):	
-		where = self.get_node(self.first_node, key)
-		if key in where.HT:
-			return where.HT[key]
-		
-		# print("[?] No saved value for key!")
+		__node = self.first_node.find_successor(key)
+		if key in __node.HT:
+			return __node.HT[key]
 		return -1
 
 	def insert(self, key, value):
-		where = self.get_node(self.first_node, key)
-		where.HT[key] = value
-
+		__node = self.first_node.find_successor(key)
+		__node.HT[key] = value
 		return 1
 
 	def join(self, new_node):
-		successor = self.get_node(self.first_node, new_node.id)
+		successor = self.first_node.find_successor(new_node.id)
 
 		if successor.node_id = new_node.id:
 			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
@@ -56,7 +42,7 @@ class Chord:
 		tmp1.finger_table[0] = new_node
 
 
-		new_node.update_finger_table(self)
+		new_node.update_finger_table(self.m ,self.first_node)
 
 
 	def leave(self, bye_node):
@@ -72,6 +58,15 @@ class Chord:
 			if self.first_node = bye_node:
 				self.first_node = bye_node.finger_table[0]
 	
+
+	def fix_fingers(self):
+		self.first_node.update_finger_table(self.m, self.first_node)
+
+		__next = self.first_node.finger_table[0]
+		while __next != self.first_node:
+			__next.update_finger_table(self.m, self.first_node)
+			__next = __next.finger_table[0]
+
 
 
 

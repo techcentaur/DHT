@@ -1,7 +1,7 @@
 from helper import *
 
 class Node:
-	def __init__(self, node_id, m,  successor=None, predecessor=None):
+	def __init__(self, node_id, m, successor=None, predecessor=None):
 		self.m = m
 		self.HT = {} # Hash Table // DS
 		self.node_id = node_id
@@ -46,10 +46,10 @@ class Node:
 	def print(self):
 		print("="*30)
 		print("[.] ID: ", self.node_id)
-		print("[.] predecessor ID: ", self.predecessor)
+		print("[.] predecessor ID: ", self.predecessor.node_id)
 		print("[.] successor ID: ", self.finger_table[0].node_id)
-		print("[.] Finger table: ")
-		for i in range(self.m):
-			print("i: {} {}".format(i, self.finger_table[i]))
+		# print("[.] Finger table: ")
+		# for i in range(self.m):
+		# 	print("i: {} {}".format(i, self.finger_table[i]))
 		print("[.] Data: ", self.HT)
 		print("="*30)

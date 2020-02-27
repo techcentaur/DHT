@@ -6,8 +6,10 @@ class Chord:
 		self.m = m
 		self.num_nodes = 2**m
 
-		self.first_node = Node(0, m, predecessor=-1)
+		self.first_node = Node(0, m)
+		self.first_node.predecessor = self.first_node
 		self.first_node.finger_table[0] = self.first_node
+		
 		self.first_node.update_finger_table(self.first_node)
 
 	def lookup(self, key, verbose=False):	
@@ -17,9 +19,9 @@ class Chord:
 			return __node.HT[key]
 		return -1
 
-	def find_successor():
+	def find_successor(self, key):
 		"""wrapper"""
-		return self.first_node.find_successor(key, self.m)
+		return self.first_node.find_successor(key)
 
 	def insert(self, key, value):
 		__node = self.find_successor(key)
@@ -27,10 +29,11 @@ class Chord:
 		return 1
 
 	def join(self, new_node):
-		successor = self.find_successor(new_node.id)
+		successor = self.find_successor(new_node.node_id)
 
-		if successor.node_id == new_node.id:
+		if successor.node_id == new_node.node_id:
 			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
+			return
 
 		for key in successor.HT:
 			d1 = dist(new_node.node_id, key)
@@ -39,15 +42,18 @@ class Chord:
 				new_node.HT[key] = successor.HT[key]
 				del successor.HT[key]
 
+		print(new_node.node_id, successor.node_id)
+		
 		tmp1 = successor.predecessor
 		new_node.finger_table[0] = successor
 		new_node.predecessor = tmp1
 
 		successor.predecessor = new_node
-		tmp1.finger_table[0] = new_node
+		if tmp1 is not -1:
+			tmp1.finger_table[0] = new_node
 
 
-		new_node.update_finger_table(self.m ,self.first_node)
+		new_node.update_finger_table(self.first_node)
 
 
 	def leave(self, bye_node):
@@ -65,11 +71,11 @@ class Chord:
 	
 
 	def fix_fingers(self):
-		self.first_node.update_finger_table(self.m, self.first_node)
+		self.first_node.update_finger_table(self.first_node)
 
 		__next = self.first_node.finger_table[0]
 		while __next != self.first_node:
-			__next.update_finger_table(self.m, self.first_node)
+			__next.update_finger_table(self.first_node)
 			__next = __next.finger_table[0]
 
 	def print(self):

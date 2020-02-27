@@ -1,7 +1,7 @@
 import random
 import hashlib
 from chord import Chord
-
+from node import Node
 
 # N = 20
 # def get_random_coordinate():
@@ -18,13 +18,14 @@ from chord import Chord
 m = 6
 chord = Chord(m)
 
-# for i in range(1):
-# 	__id = random.randint(0, 100)
-# 	chord.join(Node(__id, m))
+for i in range(2):
+	__id = random.randint(0, 100)
+	print("Adding node id: {}".format(__id))
+	chord.join(Node(__id, m))
 
+chord.fix_fingers()
 chord.print()
 
-# chord.fix_fingers()
 
 
 # for i in range(1, 5):

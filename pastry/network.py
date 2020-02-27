@@ -50,7 +50,7 @@ class Network():
 
 if __name__ == '__main__':
 	n = Network(v=True)
-	do_tests(n, num_nodes=2, num_file_insert=5)
+	do_tests(n, num_nodes=100, num_file_insert=5)
 
 
 

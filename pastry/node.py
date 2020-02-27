@@ -32,14 +32,14 @@ class Node():
 			return True
 
 		_min = self.node_id
-		for i in self.Lmin:
-			if i is not None:
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
 				if hex_compare(_min, self.Lmin[i]):
 					_min = self.Lmin[i]
 
 		_max = self.node_id
-		for i in self.Lmax:
-			if i is not None:
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
 				if hex_compare(self.Lmax[i], _max):
 					_max = self.Lmax[i]
 

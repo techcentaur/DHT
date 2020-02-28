@@ -3,27 +3,25 @@ import hashlib
 from chord import Chord
 from node import Node
 
-# N = 20
-# def get_random_coordinate():
-# 	x = random.randrange(0, N)
-# 	y = random.randrange(0, N)	
-# 	z = random.randrange(0, N)	
 
-# 	return get_hash(str(x) + "+" + str(y) + "+" + str(z))
+def get_hash(string, size=None):
+	if size:
+		return hashlib.md5(string.encode()).hexdigest()[:size]
+	return hashlib.md5(string.encode()).hexdigest()
 
-# def get_hash(string):
-# 	return hashlib.md5(string.encode()).hexdigest()
+def get_mod(key, m):
+	return hex((int('0x'+key, 16)) % (2**m))
 
-
-m = 10
+m = 16
 chord = Chord(m)
 
-for i in range(1000):
-	__id = random.randint(0, 10240) % 2**10
-	print("[*] Adding node | id -> {}".format(__id))
-	res = chord.join(Node(__id, m))
-	# print("res ", res)
-	# print("i ", i)
+for i in range(100):
+	r = random.randint(0, 60240) % (2**m)
+# 	hesh = get_hash(str(r), 8)
+	print("[*] Adding node | id -> {}".format(r))
+	res = chord.join(Node(r, m))
+# 	# print("res ", res)
+# 	# print("i ", i)
 
 
 # print("coming here")

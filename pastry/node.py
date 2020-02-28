@@ -290,20 +290,52 @@ class Node():
 		pass
 
 	def repair_R(self):
-		pass
+		for i in range(len(self.R)):
+			for j in range(len(self.R[0])):
+				if self.R[i][j] is not None:
+					pos = net.nodes[self.R[i][j]].position
+					if not net.ping(pos[0], pos[1]):
+						for k in range(len(self.R[0])):
+							if self.R[i][k] is not None:
+								self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+								break
 
 	def repair_M(self):
+		none = []
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
 				if not net.ping(self.M[i][0][0], self.M[i][0][1]):
 					self.M[i] = None
+					none.append(i)
+			else:
+				none.append(i)
 
-		none_count = 0
+		sort_M = []
 		for i in range(len(self.M)):
-			if self.M[i] is None:
-				none_count += 1
+			if self.M[i] is not None:
+				sort_M.append((i, distance_metric(self.position, self.M[i][0])))
+		sort_M.sort(key=lambda x: x[1])
 
-		while 
+		b=len(none)
+		for i in sort_M:
+			tmp = []
+			for i in net.nodes[self.M[i][1]].M:
+				if i is not None:
+					if net.ping(i[0][0], i[0][1]):
+						tmp.append((i, distance_metric(self.position, i[0])))
+			tmp.sort(key=lambda x: x[1])
+
+
+			_range_ = min(len(tmp), len(none))
+			for i in range(_range_):
+				self.M[none[i]] = tmp[i][0]
+				b -= 1
+			if b<=0:
+				break
+			none = none[b:]
+
+
+
 
 
 

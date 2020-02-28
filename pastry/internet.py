@@ -1,11 +1,13 @@
 import random
 import numpy as np
+from hashlib import md5
 from constats import *
 
 class Internet():
 	def __init__(self):
 		self.nodes = {}
 		self.P = np.zeros((N, N))
+		self.deleted_nodes = {}
 
 	def get_new_coordinates(self):
 		while True:
@@ -45,11 +47,20 @@ class Internet():
 					return p
 		return None
 
-	def alive(self, point):
+	def alive(self, point, hesh):
 		self.P[point[0], point[1]] = 1
+		self.deleted_nodes[hesh] = False
+
+	def dead(self, point):
+		self.P[point[0], point[1]] = 0
+		
+		string = str(point[0]) + "+" + str(point[1])
+		hesh =  md5(string.encode()).hexdigest()[:hash_size]
+		self.deleted_nodes[hesh] = True
 
 	def debug(self):
 		for v, n in net.nodes.items():
-			n.print_tables()
+			if not self.deleted_nodes[v]:
+				n.print()
 
 net = Internet()

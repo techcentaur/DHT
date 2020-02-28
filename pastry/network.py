@@ -18,7 +18,7 @@ class Network():
 		if self.v:
 			print("[!] Adding {} | {}".format((x, y), node_hash))
 
-		net.alive((x, y))
+		net.alive((x, y), node_hash)
 		net.nodes[node_hash] = Node(node_hash, (x, y))
 
 		close_node = net.get_proximity_close_alive_node((x, y))
@@ -50,7 +50,7 @@ class Network():
 
 if __name__ == '__main__':
 	n = Network(v=True)
-	do_tests(n, num_nodes=4, num_files=10)
+	do_tests(n, num_nodes=20, num_files=0)
 
 
 

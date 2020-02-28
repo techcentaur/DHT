@@ -10,7 +10,7 @@ class Node():
 		self.node_id = node_id
 		self.position = position
 		self.R = [[None for j in range(pow(2, b))] for i in range(hash_size)]
-		self.M = [None for x in range(pow(2, b+1))]
+		self.M = [None for x in range(pow(2, b))]
 		self.Lmin = [None for x in range(pow(2, b-1))]
 		self.Lmax = [None for x in range(pow(2, b-1))] 
 		self.HT = {}
@@ -280,11 +280,16 @@ class Node():
 				return net.nodes[route].forward(msg, key)
 
 			k = self.all_minimal_key(key)
-			if k == self.node_id:
+			if k == self.node_id:	
 				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 
 	def __repair_Lmin__(self):
+		# for i in range(len(self.Lmin)):
+		# 	if self.Lmin[i] is not None:
+		# 		pos = net.nodes[self.Lmin[i]].position
+		# 		if not net.ping[pos[0], pos[1]]:
+
 		pass
 
 	def __repair_Lmax__(self):
@@ -311,20 +316,21 @@ class Node():
 						flag=True
 						for k in range(len(self.R[0])):
 							if k != j:
-								pos2 = net.nodes[self.R[i][k]].position
-								if net.ping[pos2[0], pos2[1]]:
-									if net.nodes[self.R[i][k]].R[i][j] is not None:
-										self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
-										flag=False
-										break
+								if self.R[i][k] is not None:
+									pos2 = net.nodes[self.R[i][k]].position
+									if net.ping(pos2[0], pos2[1]):
+										if net.nodes[self.R[i][k]].R[i][j] is not None:
+											self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+											flag=False
+											break
 						write_flag=True
 						if flag:
 							for k in range(i+1, len(self.R)):
-								for l in range(len(self.R[0]))
+								for l in range(len(self.R[0])):
 									if l != j:
 										if self.R[k][l] is not None:
 											pos1 = net.nodes[self.R[k][l]].position
-											if net.ping[pos1[0], pos1[1]]:
+											if net.ping(pos1[0], pos1[1]):
 												if net.nodes[self.R[k][l]].R[i][j] is not None:
 													self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
 													write_flag=False
@@ -350,12 +356,13 @@ class Node():
 		sort_M.sort(key=lambda x: x[1])
 
 		b=len(none)
-		for i in sort_M:
+		for j in sort_M:
 			tmp = []
-			for i in net.nodes[self.M[i][1]].M:
-				if i is not None:
-					if net.ping(i[0][0], i[0][1]):
-						tmp.append((i, distance_metric(self.position, i[0])))
+			for i in net.nodes[self.M[j[0]][1]].M:
+				if (i is not None) and (i[0] != self.position):
+					if i not in self.M:
+						if net.ping(i[0][0], i[0][1]):
+							tmp.append((i, distance_metric(self.position, i[0])))
 			tmp.sort(key=lambda x: x[1])
 
 
@@ -366,4 +373,10 @@ class Node():
 			if b<=0:
 				break
 			none = none[b:]
+
+	def repair(self):
+		self.repair_M()
+		self.repair_R()
+		# self.repair_L()
+
 

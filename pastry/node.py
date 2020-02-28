@@ -103,7 +103,6 @@ class Node():
 			if (x1 > x) or (x1==x and y1<y):
 				self.Lmin[j] = key
 
-
 	def transmit_state(self):
 		n = self.node_id
 		p = self.position
@@ -143,7 +142,6 @@ class Node():
 		if d > d1:
 			self.M[_i] = (pos, key)
 
-
 	def __update__Lmax(self, key, pos):
 		for i in range(len(self.Lmax)):
 			if self.Lmax[i] is None:
@@ -174,7 +172,6 @@ class Node():
 		if (x1 > x) or (x1==x and y1<y):
 			self.Lmin[j] = key
 
-
 	def update_presence(self, key, pos):
 		# M
 		if (pos, key) not in self.M:
@@ -194,7 +191,6 @@ class Node():
 		else:
 			if key not in self.Lmin:
 				self.__update__Lmin(key, pos)
-
 
 	def minimal_key(self, key):
 		x, y = hex_distance(key, self.node_id)
@@ -225,7 +221,6 @@ class Node():
 			return True
 		return False
 
-
 	def all_minimal_key(self, key):
 		i = hex_different_index(key, self.node_id)
 
@@ -254,7 +249,6 @@ class Node():
 						return self.R[i][j]
 
 		return self.node_id
-
 
 	def deliver(self, msg, key):
 		if msg == JOIN_MESSAGE:
@@ -291,3 +285,25 @@ class Node():
 			return net.nodes[k].forward(msg, key)
 
 		print("**************this can't possible print")
+
+	def repair_L(self):
+		pass
+
+	def repair_R(self):
+		pass
+
+	def repair_M(self):
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				if not net.ping(self.M[i][0][0], self.M[i][0][1]):
+					self.M[i] = None
+
+		none_count = 0
+		for i in range(len(self.M)):
+			if self.M[i] is None:
+				none_count += 1
+
+		while 
+
+
+

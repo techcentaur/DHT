@@ -16,11 +16,9 @@ class Node:
 
 
 	def print(self):
-		print("[@] ID: ", self.node_id)
-		print("\t[.] predecessor ID: ", self.predecessor.node_id)
-		print("\t[.] successor ID: ", self.finger_table[0].node_id)
+		print("[#] ID: {} | (predecessor, successor) -> ({} - {})".format(self.node_id, self.predecessor.node_id, self.finger_table[0].node_id))
 		# print("[.] Finger table: ")
 		# for i in range(self.m):
-		# 	print("i: {} {}".format(i, self.finger_table[i]))
+		# 	print("i: {} {}".format(i, self.finger_table[i].node_id))
 		print("\t[.] Data: ", self.HT)
 		print("-"*50)

@@ -18,29 +18,33 @@ from node import Node
 m = 10
 chord = Chord(m)
 
-for i in range(10):
+for i in range(1000):
 	__id = random.randint(0, 10240) % 2**10
 	print("[*] Adding node | id -> {}".format(__id))
-	chord.join(Node(__id, m))
+	res = chord.join(Node(__id, m))
+	# print("res ", res)
+	# print("i ", i)
 
+
+# print("coming here")
 chord.fix_fingers()
-
-keys = []
-for i in range(1, 5):
-	print("[.] Inserting file: file{}".format(i))
-	key = random.randint(0, 2**10)
-	chord.insert(key, "file{}".format(i))
-	keys.append(key)
+# keys = []
+# for i in range(1, 5):
+# 	print("[.] Inserting file: file{}".format(i))
+# 	key = random.randint(0, 2**10)
+# 	chord.insert(key, "file{}".format(i))
+# 	keys.append(key)
+# print("coming here too")
 
 chord.print()
-l = int(input())
+# l = int(input())
 
-chord.leave_node_by_key(l)
-chord.fix_fingers()
-chord.print()
-input()
+# chord.leave_node_by_key(l)
+# chord.fix_fingers()
+# chord.print()
+# input()
 
-for i in range(1, 5):
-	val = chord.lookup(keys[i-1], True)
-	print("\n{}->{}".format(keys[i-1], val))
+# for i in range(1, 5):
+# 	val = chord.lookup(keys[i-1], True)
+# 	print("\n{}->{}".format(keys[i-1], val))
 

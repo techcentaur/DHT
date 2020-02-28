@@ -31,20 +31,24 @@ class Chord:
 		return key % self.num_nodes
 
 	def find_successor(self, key, verbose=False):
+		# print("a")
 		__key = self.get_hash(key)
 		pointer = self.first_node
 
+		# print("b")
 		# if verbose:
 		# 	print(": {}".format(pointer.node_id), end='')
 		first=True
 		while True:
+			# print("c")
+			# print(pointer.node_id)
 			if verbose:
 				if first:
 					first=False
 					print(": {}".format(pointer.node_id), end='')
 				else:
 					print("-> {}".format(pointer.node_id), end='')
-			if pointer.node_id is __key:
+			if pointer.node_id == __key:
 				if verbose:
 					print("-> {}".format(pointer.node_id), end='')
 				return pointer
@@ -71,12 +75,13 @@ class Chord:
 		return 1
 
 	def join(self, new_node):
+		# print("0")
 		successor = self.find_successor(new_node.node_id)
 
+		# print("1")
 		if successor.node_id == new_node.node_id:
 			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
-			return
-
+			return -1
 		for key in successor.HT:
 			d1 = self.dist(new_node.node_id, k)
 
@@ -84,16 +89,21 @@ class Chord:
 				new_node.HT[key] = successor.HT[key]
 				del successor.HT[key]
 
+		# print("2")
 		# stabilization		
 		tmp1 = successor.predecessor
 		new_node.finger_table[0] = successor
 		new_node.predecessor = tmp1
 
+		# print("3")
 		# notify
 		successor.predecessor = new_node
 		tmp1.finger_table[0] = new_node
 
+		# print("4")
 		new_node.update_finger_table(self)
+		# print("5")
+		return 1
 
 
 	def leave(self, bye_node):

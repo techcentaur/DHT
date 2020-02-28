@@ -4,13 +4,13 @@ from chord import Chord
 from node import Node
 
 
-def get_hash(string, size=None):
-	if size:
-		return hashlib.md5(string.encode()).hexdigest()[:size]
-	return hashlib.md5(string.encode()).hexdigest()
+# def get_hash(string, size=None):
+# 	if size:
+# 		return hashlib.md5(string.encode()).hexdigest()[:size]
+# 	return hashlib.md5(string.encode()).hexdigest()
 
-def get_mod(key, m):
-	return hex((int('0x'+key, 16)) % (2**m))
+# def get_mod(key, m):
+# 	return hex((int('0x'+key, 16)) % (2**m))
 
 m = 16
 chord = Chord(m)

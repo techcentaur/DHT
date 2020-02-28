@@ -4,12 +4,11 @@ from helper import *
 class Chord:
 	def __init__(self, m):
 		self.m = m
-		self.num_nodes = 2**m
+		self.create()
 
-		self.first_node = Node(0, m)
-		self.first_node.predecessor = self.first_node
-		self.first_node.finger_table[0] = self.first_node
-		
+	def create(self):
+		self.first_node = Node(0, self.m)
+		self.first_node.predecessor, self.first_node.finger_table[0] = self.first_node, self.first_node
 		self.first_node.update_finger_table(self)
 
 	def dist(self, id1, id2):
@@ -17,8 +16,7 @@ class Chord:
 			return 0
 		if id1 < id2:
 			return id2-id1
-		return self.num_nodes - id1 + id2
-
+		return (2**self.m) - id1 + id2
 
 	def lookup(self, key, verbose=False):	
 		print("Look up {}".format(key), end='')
@@ -28,20 +26,16 @@ class Chord:
 		return -1
 
 	def get_hash(self, key):
-		return key % self.num_nodes
+		return key % (2**self.m)
 
 	def find_successor(self, key, verbose=False):
-		# print("a")
 		__key = self.get_hash(key)
 		pointer = self.first_node
 
-		# print("b")
 		# if verbose:
 		# 	print(": {}".format(pointer.node_id), end='')
 		first=True
 		while True:
-			# print("c")
-			# print(pointer.node_id)
 			if verbose:
 				if first:
 					first=False
@@ -61,12 +55,10 @@ class Chord:
 			__node = pointer.finger_table[-1]
 
 			i = 0
-			bound = len(pointer.finger_table)-1
-			while i < bound:
+			while i < len(pointer.finger_table)-1:
 				if self.dist(pointer.finger_table[i].node_id, __key) < self.dist(pointer.finger_table[i+1].node_id, __key):
 					__node = pointer.finger_table[i]
 				i += 1
-
 			pointer = __node
 
 	def insert(self, key, value):
@@ -75,13 +67,12 @@ class Chord:
 		return 1
 
 	def join(self, new_node):
-		# print("0")
 		successor = self.find_successor(new_node.node_id)
 
-		# print("1")
 		if successor.node_id == new_node.node_id:
 			print("[?] Node with ID: {} exists in chord!".format(new_node.node_id))
 			return -1
+
 		for key in successor.HT:
 			d1 = self.dist(new_node.node_id, k)
 
@@ -89,20 +80,14 @@ class Chord:
 				new_node.HT[key] = successor.HT[key]
 				del successor.HT[key]
 
-		# print("2")
-		# stabilization		
 		tmp1 = successor.predecessor
 		new_node.finger_table[0] = successor
 		new_node.predecessor = tmp1
 
-		# print("3")
-		# notify
 		successor.predecessor = new_node
 		tmp1.finger_table[0] = new_node
 
-		# print("4")
 		new_node.update_finger_table(self)
-		# print("5")
 		return 1
 
 

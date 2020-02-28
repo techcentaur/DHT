@@ -10,15 +10,11 @@ class Node:
 		self.finger_table = [successor]
 
 	def update_finger_table(self, chord):
-		del self.finger_table[1:]
+		tmp_table = [self.finger_table[0]]
 		for i in range(1, self.m):
-			self.finger_table.append(chord.find_successor(self.node_id + (2**i)))
-
+			tmp_table.append(chord.find_successor(self.node_id + (2**i)))
+		self.finger_table = tmp_table
 
 	def print(self):
 		print("[#] ID: {} | (predecessor, successor) -> ({} - {})".format(self.node_id, self.predecessor.node_id, self.finger_table[0].node_id))
-		# print("[.] Finger table: ")
-		# for i in range(self.m):
-		# 	print("i: {} {}".format(i, self.finger_table[i].node_id))
-		print("\t[.] Data: ", self.HT)
-		print("-"*50)
+		# print("\t[.] Data: ", self.HT)

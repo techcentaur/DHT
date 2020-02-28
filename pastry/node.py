@@ -284,8 +284,23 @@ class Node():
 				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 
-	def repair_L(self):
+	def __repair_Lmin__(self):
 		pass
+
+	def __repair_Lmax__(self):
+		pass
+
+	def repair_L(self):
+		"""
+		Repairing the leaf set
+		Assume that a leaf L−k fails. (−L/2 < k < 0).
+		In this case, the node contacts L−L/2.
+		It gets its leaf set and merges it with its leaf set.
+		For any new nodes added, it verifies their existence by pinging
+		them.
+		"""
+		self.__repair_Lmin__()
+		self.__repair_Lmax__()
 
 	def repair_R(self):
 		for i in range(len(self.R)):
@@ -296,10 +311,12 @@ class Node():
 						flag=True
 						for k in range(len(self.R[0])):
 							if k != j:
-								if net.nodes[self.R[i][k]].R[i][j] is not None:
-									self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
-									flag=False
-									break
+								pos2 = net.nodes[self.R[i][k]].position
+								if net.ping[pos2[0], pos2[1]]:
+									if net.nodes[self.R[i][k]].R[i][j] is not None:
+										self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+										flag=False
+										break
 						write_flag=True
 						if flag:
 							for k in range(i+1, len(self.R)):
@@ -317,8 +334,6 @@ class Node():
 							if not write_flag:
 								break
 						# None has been changed
-		
-
 
 	def repair_M(self):
 		none = []
@@ -351,10 +366,4 @@ class Node():
 			if b<=0:
 				break
 			none = none[b:]
-
-
-
-
-
-
 

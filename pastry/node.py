@@ -284,8 +284,6 @@ class Node():
 				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 
-		print("**************this can't possible print")
-
 	def repair_L(self):
 		pass
 
@@ -295,10 +293,32 @@ class Node():
 				if self.R[i][j] is not None:
 					pos = net.nodes[self.R[i][j]].position
 					if not net.ping(pos[0], pos[1]):
+						flag=True
 						for k in range(len(self.R[0])):
-							if self.R[i][k] is not None:
-								self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+							if k != j:
+								if net.nodes[self.R[i][k]].R[i][j] is not None:
+									self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+									flag=False
+									break
+						write_flag=True
+						if flag:
+							for k in range(i+1, len(self.R)):
+								for l in range(len(self.R[0]))
+									if l != j:
+										if self.R[k][l] is not None:
+											pos1 = net.nodes[self.R[k][l]].position
+											if net.ping[pos1[0], pos1[1]]:
+												if net.nodes[self.R[k][l]].R[i][j] is not None:
+													self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
+													write_flag=False
+													break
+								if not write_flag:
+									break
+							if not write_flag:
 								break
+						# None has been changed
+		
+
 
 	def repair_M(self):
 		none = []
@@ -307,8 +327,6 @@ class Node():
 				if not net.ping(self.M[i][0][0], self.M[i][0][1]):
 					self.M[i] = None
 					none.append(i)
-			else:
-				none.append(i)
 
 		sort_M = []
 		for i in range(len(self.M)):
@@ -333,6 +351,7 @@ class Node():
 			if b<=0:
 				break
 			none = none[b:]
+
 
 
 

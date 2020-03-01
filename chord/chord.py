@@ -2,58 +2,57 @@ from node import Node
 from helper import *
 
 class Chord:
-	def __init__(self, m):
+	def __init__(self, m, dist="integer"):
 		self.m = m
+		self.distance = dist
 		self.create()
 
 	def create(self):
-		self.first_node = Node(0, self.m)
+		if self.distance=="integer":
+			self.first_node = Node(0, self.m)
+		else:
+			self.first_node = Node("0"*int(self.m/4), self.m)
 		self.first_node.predecessor, self.first_node.finger_table[0] = self.first_node, self.first_node
 		self.first_node.update_finger_table(self)
 
 	def dist(self, id1, id2):
-		if id1==id2:
-			return 0
-		if id1 < id2:
-			return id2-id1
-		return (2**self.m) - id1 + id2
+		if self.distance == "integer":
+			if id1==id2:
+				return 0
+			if id1 < id2:
+				return id2-id1
+			return (2**self.m) - id1 + id2
+		else:
+			if id1==id2:
+				return 0
+			sub = (int('0x'+id2, 16) - int('0x'+id1, 16))
+			if (int('0x'+id2, 16) > int('0x'+id1, 16)):
+				return hex(sub)
+			return hex((2**self.m + sub) % (2**self.m))
 
 	def lookup(self, key, verbose=False):	
-		print("Look up {}".format(key), end='')
 		__node = self.find_successor(key, verbose)
 		if key in __node.HT:
 			return __node.HT[key]
 		return -1
 
 	def get_hash(self, key):
-		return key % (2**self.m)
+		if self.distance=="integer":
+			return key % 2**self.m
+		else:
+			return hex(int('0x'+key, 16) % (2**self.m))[2:]
 
 	def find_successor(self, key, verbose=False):
 		__key = self.get_hash(key)
 		pointer = self.first_node
 
-		# if verbose:
-		# 	print(": {}".format(pointer.node_id), end='')
-		first=True
 		while True:
-			if verbose:
-				if first:
-					first=False
-					print(": {}".format(pointer.node_id), end='')
-				else:
-					print("-> {}".format(pointer.node_id), end='')
 			if pointer.node_id == __key:
-				if verbose:
-					print("-> {}".format(pointer.node_id), end='')
 				return pointer
-
 			if self.dist(pointer.node_id, __key) <= self.dist(pointer.finger_table[0].node_id, __key):
-				if verbose:
-					print("-> {}".format(pointer.finger_table[0].node_id), end='')
 				return pointer.finger_table[0]
 			
 			__node = pointer.finger_table[-1]
-
 			i = 0
 			while i < len(pointer.finger_table)-1:
 				if self.dist(pointer.finger_table[i].node_id, __key) < self.dist(pointer.finger_table[i+1].node_id, __key):

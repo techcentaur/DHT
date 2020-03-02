@@ -8,6 +8,7 @@ class IntegerTest:
 	def __init__(self, m, _range=1000):
 		self.m = m
 		self.range = _range
+		self.nodes_ids = []
 
 	def setup(self, num=10):
 		self.chord = Chord(self.m, dist="integer")
@@ -19,7 +20,7 @@ class IntegerTest:
 				__id = random.randrange(0, self.range) % (2**self.m)
 				# print("[#] Adding node: ", __id)
 				res = self.chord.join(Node(__id, self.m))
-
+			self.nodes_ids.append(__id)
 		self.chord.fix_fingers()
 
 	def print(self):
@@ -50,10 +51,11 @@ class IntegerTest:
 			else:
 				hops[val] = 1
 		return hops
-		
-	def deletion(self):
-		pass
 
+	def deletion(self, num=1):
+		for i in range(num):
+			self.chord.leave_node_by_key(self.nodes_ids[i])
+			self.chord.fix_fingers()
 
 class HexTest:
 	def __init__(self, m, _range=1000):

@@ -117,7 +117,6 @@ class Chord:
 			return 
 		else:
 			self.leave(res)
-			print("[*] removed successfully")
 
 
 	def find_node_by_key(self, key):

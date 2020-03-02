@@ -9,7 +9,7 @@ from dht import IntegerTest, HexTest
 #==================================
 # Writing experiments
 
-def experiment(number):
+def experiment(number, lookup_path=False):
 	"""
 	number = {}
 	keys: 'nodes', 'data', 'queries'
@@ -17,6 +17,8 @@ def experiment(number):
 	it = IntegerTest(40, 10000)
 	it.setup(number["nodes"])
 	it.insert(number["data"])
+	print("[?] Executing {} random queries!".format(number["queries"]))
+
 	hops = it.lookup(number["queries"])
 	print("\t[HOPS]: ", hops)
 
@@ -42,6 +44,7 @@ def experiment(number):
 	it.deletion(int(number["nodes"]/2))
 	print("\n[-] Deleted {} random nodes!\n".format(int(number["nodes"]/2)))
 
+	print("[?] Executing {} random queries!".format(number["queries"]))
 	hops = it.lookup(number["queries"])
 	print("\t[HOPS]: ", hops)
 
@@ -65,13 +68,26 @@ def experiment(number):
 	print("[+] Histogram saved as: {}".format(fig2))
 
 
+	if lookup_path:
+		it.lookup(10, verbose=True)
+
 #==================================
 
-test1 = {"nodes": 10, "data": 1000, "queries": 10000}
+test1 = {"nodes": 100, "data": 1000, "queries": 10000}
 test2 = {"nodes": 20, "data": 1000, "queries": 10000}
 test3 = {"nodes": 30, "data": 1000, "queries": 10000}
 # data1 = {"nodes": 100, "data": 10000, "queries": 1000000}
 # data2 = {"nodes": 500, "data": 10000, "queries": 1000000}
 # data3 = {"nodes": 1000, "data": 10000, "queries": 1000000}
 
-experiment(data)
+print("="*20, "For {} nodes".format(test1["nodes"]),"="*20)
+experiment(test1, lookup_path=True)
+print("="*60)
+
+print("="*20, "For {} nodes".format(test2["nodes"]),"="*20)
+experiment(test2)
+print("="*60)
+
+print("="*20, "For {} nodes".format(test3["nodes"]),"="*20)
+experiment(test3)
+print("="*60)

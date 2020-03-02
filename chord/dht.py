@@ -39,12 +39,11 @@ class IntegerTest:
 		if lookup:
 			self.lookup()
 
-	def lookup(self, num):
-		print("[?] Executing {} random queries!".format(num))
+	def lookup(self, num, verbose=False):
 		hops = {}
 		for i in range(num):
 			j = random.randrange(0, len(self.keys))
-			val = self.chord.lookup(self.keys[j], True)
+			val = self.chord.lookup(self.keys[j], verbose)
 			# print("Lookup of: {} -> got: {}".format("file{}".format(i), val))
 			if val in hops:
 				hops[val] += 1

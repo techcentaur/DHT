@@ -31,7 +31,9 @@ class Chord:
 			return hex((2**self.m + sub) % (2**self.m))
 
 	def lookup(self, key, verbose=False):	
-		__node, h = self.find_successor(key, hops=True)
+		if verbose:
+			print("LOOKUP {}:".format(key), end='')
+		__node, h = self.find_successor(key, True, verbose)
 		if key in __node.HT:
 			return h
 		return -1
@@ -42,7 +44,7 @@ class Chord:
 		else:
 			return hex(int('0x'+key, 16) % (2**self.m))[2:]
 
-	def find_successor(self, key, hops=False):
+	def find_successor(self, key, hops=False, verbose=False):
 		h = 0
 		
 		__key = self.get_hash(key)
@@ -50,14 +52,22 @@ class Chord:
 
 		while True:
 			if pointer.node_id == __key:
+				if verbose:
+					print("-> {}".format(pointer.node_id))
 				if hops:
 					return pointer, h
 				return pointer
+
 			if self.dist(pointer.node_id, __key) <= self.dist(pointer.finger_table[0].node_id, __key):
+				if verbose:
+					print("-> {}".format(pointer.node_id))
+
 				if hops:
 					return pointer.finger_table[0], h
 				return pointer.finger_table[0]
-
+			if verbose:
+				print("-> {}".format(pointer.node_id), end='')
+		
 			__node = pointer.finger_table[-1]
 			i = 0
 			while i < len(pointer.finger_table)-1:

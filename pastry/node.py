@@ -367,9 +367,6 @@ class Node():
 					if self.R[i][j] == key:
 						self.R[i][j] = None
 						idx = (i, j)
-			else:
-				continue
-			break
 
 		if idx is -1:
 			return

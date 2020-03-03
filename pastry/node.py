@@ -255,7 +255,8 @@ class Node():
 			net.nodes[key].update_L(self.Lmin, self.Lmax, self.node_id)
 			return 1
 		elif msg==LOOKUP_MESSAGE:
-			return self.HT[key]
+			# return self.HT[key]
+			return 1
 		else:
 			self.HT[key] = msg
 			return 1
@@ -264,7 +265,7 @@ class Node():
 		if msg==JOIN_MESSAGE:
 			x = hex_different_index(key, self.node_id)
 			net.nodes[key].update_R(x, self.R[x])
-		return self.__forward__(msg, key)
+		return 1 + self.__forward__(msg, key)
 
 	def __forward__(self, msg, key):
 		if self.in_leaf_set(key):
@@ -318,6 +319,7 @@ class Node():
 						if k not in self.Lmin:
 							self.Lmin[idx] = k
 							return
+		self.Lmin[idx] = None
 
 
 	def __repair_Lmax__(self, key, pos):
@@ -354,6 +356,7 @@ class Node():
 						if k not in self.Lmax:
 							self.Lmax[idx] = k
 							return
+		self.Lmax[idx] = None
 
 	def repair_R(self, key, pos):
 		idx = -1
@@ -362,8 +365,8 @@ class Node():
 			for j in range(len(self.R[0])):
 				if self.R[i][j] is not None:
 					if self.R[i][j] == key:
+						self.R[i][j] = None
 						idx = (i, j)
-						break
 			else:
 				continue
 			break
@@ -372,7 +375,6 @@ class Node():
 			return
 
 		(i, j) = idx
-		flag=False
 		for k in range(len(self.R[0])):
 			if k != j:
 				if self.R[i][k] is not None:
@@ -398,10 +400,14 @@ class Node():
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
 				if self.M[i][1] == key:
+					# self.M[i] = None
 					idx = i
 					break
 		if idx==-1:
 			return
+
+		# print(self.M)
+		# print(idx, " idx", i, " i")
 
 		sort_M = []
 		for i in range(len(self.M)):
@@ -420,7 +426,9 @@ class Node():
 
 			if len(tmp) > 0:
 				self.M[idx] = tmp[0][0]
-				break
+				return
+		# print(self.M)
+
 
 	def repair_L(self, key, pos):
 		self.__repair_Lmin__(key, pos)

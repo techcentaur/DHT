@@ -1,25 +1,24 @@
 import random
-import numpy as np
 from hashlib import md5
 from constats import *
 
 class Internet():
 	def __init__(self):
 		self.nodes = {}
-		self.P = np.zeros((N, N))
+		self.P = [[0 for i in range(N)] for i in range(N)]
 		self.deleted_nodes = {}
 
 	def get_new_coordinates(self):
 		while True:
 			x = random.randrange(0, N)
 			y = random.randrange(0, N)	
-			if self.P[x, y]==0:
+			if self.P[x][y]==0:
 				break
 		return x, y
 
 	def ping(self, x, y):
 		if (x >= 0 and x < N) and (y>=0 and y<N):
-			return self.P[x, y]
+			return self.P[x][y]
 		return False
 
 	def get_proximity_close_alive_node(self, tup):
@@ -48,32 +47,45 @@ class Internet():
 		return None
 
 	def alive(self, point, hesh):
-		self.P[point[0], point[1]] = 1
+		self.P[point[0]][point[1]] = 1
 		self.deleted_nodes[hesh] = False
 
 	def dead(self, point):
-		self.P[point[0], point[1]] = 0
+		self.P[point[0]][point[1]] = 0
 		
 		string = str(point[0]) + "+" + str(point[1])
 		hesh =  md5(string.encode()).hexdigest()[:hash_size]
 		self.deleted_nodes[hesh] = True
 
-	def delete(self):
+	def delete(self, num=1):
+		for i in range(num):
+			self.__delete__()
+
+	def __delete__(self):
 		key = random.choice(list(self.nodes.keys()))
 		pos = self.nodes[key].position
+		print("[?] Deleting: node {} at position {}".format(key, pos))
 
 		# delete this node
 		self.nodes.pop(key, None)
-		self.P[pos[0], pos[1]] = 0
+		self.P[pos[0]][pos[1]] = 0
 		self.deleted_nodes[key] = True
 
 		for k, v in self.nodes.items():
 			v.repair(key, pos)
 
+		net.debug()
+		print("[.] Deleted: node {} at position {}".format(key, pos))
 
 	def debug(self):
 		for v, n in net.nodes.items():
 			if not self.deleted_nodes[v]:
 				n.print()
+
+	def restart_internet(self):
+		self.nodes = {}
+		self.P = [[0 for i in range(N)] for i in range(N)]
+		self.deleted_nodes = {}
+
 
 net = Internet()

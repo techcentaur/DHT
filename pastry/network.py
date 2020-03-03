@@ -2,7 +2,7 @@ from hashlib import md5
 
 from node import Node
 from internet import net # global object
-
+import random
 from constats import *
 
 def get_hash(string):
@@ -36,10 +36,20 @@ class Network():
 		# net.nodes[node_hash].print()
 		net.nodes[node_hash].transmit_state()
 
+	def lookup_n_queries(self, points, num=1):
+		hops = {}
+		for i in range(num):
+			rand = random.randrange(1, points)
+			h = self.lookup(get_hash("key {}".format(rand)))
+			if h in hops:
+				hops[h] += 1
+			else:
+				hops[h] = 1
+		return hops
 
 	def lookup(self, key, msg=LOOKUP_MESSAGE):
-		data = next(iter(net.nodes.values())).forward(msg, key)
-		return data
+		hops = next(iter(net.nodes.values())).forward(msg, key)
+		return hops
 
 	def insert(self, msg, key):
 		res = (next(iter(net.nodes.values()))).forward(msg, key)

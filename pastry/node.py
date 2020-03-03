@@ -294,27 +294,28 @@ class Node():
 			if self.Lmin[i] is not None:
 				if self.Lmin[i] == key:
 					idx = i
-				if hex_compare(self.Lmin[i], key):
-					sort_u.append((self.Lmin[i], self.hex_distance(self.node_id, self.Lmin[i])))
 				else:
-					sort_l.append((self.Lmin[i], self.hex_distance(self.node_id, self.Lmin[i])))
+					if hex_compare(self.Lmin[i], key):
+						sort_u.append((self.Lmin[i], hex_distance(self.node_id, self.Lmin[i])))
+					else:
+						sort_l.append((self.Lmin[i], hex_distance(self.node_id, self.Lmin[i])))
 		if idx == -1:
 			return
 
-		sort_u.sorted(key=lambda x: x[1])
-		sort_l.sorted(key=lambda x: x[1])
+		sort_u.sort(key=lambda x: x[1])
+		sort_l.sort(key=lambda x: x[1])
 
 		for s in sort_u:
 			for k in net.nodes[s[0]].Lmin:
 				if k is not None:
-					if k is not in self.Lmin:
+					if k not in self.Lmin:
 						self.Lmin[idx] = k
 						return
 		for s in sort_l:
 			for k in net.nodes[s[0]].Lmax:
 				if k is not None:
 					if hex_compare(self.node_id, k):
-						if k is not in self.Lmin:
+						if k not in self.Lmin:
 							self.Lmin[idx] = k
 							return
 
@@ -329,15 +330,17 @@ class Node():
 			if self.Lmax[i] is not None:
 				if self.Lmax[i] == key:
 					idx = i
-				if hex_compare(key, self.Lmax[i]):
-					sort_l.append((self.Lmax[i], self.hex_distance(self.node_id, self.Lmax[i])))
 				else:
-					sort_u.append((self.Lmax[i], self.hex_distance(self.node_id, self.Lmax[i])))
+					if hex_compare(key, self.Lmax[i]):
+						sort_l.append((self.Lmax[i], hex_distance(self.node_id, self.Lmax[i])))
+					else:
+						sort_u.append((self.Lmax[i], hex_distance(self.node_id, self.Lmax[i])))
 		if idx == -1:
 			return
 
-		sort_u.sorted(key=lambda x: x[1])
-		sort_l.sorted(key=lambda x: x[1])
+		sort_u.sort(key=lambda x: x[1])
+		sort_l.sort(key=lambda x: x[1])
+
 		for s in sort_l:
 			for k in net.nodes[s[0]].Lmax:
 				if k is not None:
@@ -348,14 +351,9 @@ class Node():
 			for k in net.nodes[s[0]].Lmin:
 				if k is not None:
 					if hex_compare(k, self.node_id):
-						if k is not in self.Lmax:
+						if k not in self.Lmax:
 							self.Lmax[idx] = k
 							return
-
-
-	def repair_L(self, key, pos):
-		self.__repair_Lmin__(key, pos)
-		self.__repair_Lmax__(key, pos)
 
 	def repair_R(self, key, pos):
 		idx = -1
@@ -408,7 +406,8 @@ class Node():
 		sort_M = []
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
-				sort_M.append((i, distance_metric(self.position, self.M[i][0])))
+				if i != idx:
+					sort_M.append((i, distance_metric(self.position, self.M[i][0])))
 		sort_M.sort(key=lambda x: x[1])
 
 		for j in sort_M:
@@ -423,9 +422,12 @@ class Node():
 				self.M[idx] = tmp[0][0]
 				break
 
+	def repair_L(self, key, pos):
+		self.__repair_Lmin__(key, pos)
+		self.__repair_Lmax__(key, pos)
+
 	def repair(self, key, pos):
 		self.repair_M(key, pos)
 		self.repair_R(key, pos)
 		self.repair_L(key, pos)
-
 

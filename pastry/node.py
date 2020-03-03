@@ -285,39 +285,75 @@ class Node():
 			return net.nodes[k].forward(msg, key)
 
 	def __repair_Lmin__(self, key, pos):
-		# for i in range(len(self.Lmin)):
-		# 	if self.Lmin[i] is not None:
-		# 		pos = net.nodes[self.Lmin[i]].position
-		# 		if not net.ping[pos[0], pos[1]]:
+		idx = -1
 
-		pass
+		sort_l = []
+		sort_u = []
+		# sort_l << key << sort_u << self.node_id
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				if self.Lmin[i] == key:
+					idx = i
+				if hex_compare(self.Lmin[i], key):
+					sort_u.append((self.Lmin[i], self.hex_distance(self.node_id, self.Lmin[i])))
+				else:
+					sort_l.append((self.Lmin[i], self.hex_distance(self.node_id, self.Lmin[i])))
+		if idx == -1:
+			return
+
+		sort_u.sorted(key=lambda x: x[1])
+		sort_l.sorted(key=lambda x: x[1])
+
+		for s in sort_u:
+			for k in net.nodes[s[0]].Lmin:
+				if k is not None:
+					if k is not in self.Lmin:
+						self.Lmin[idx] = k
+						return
+		for s in sort_l:
+			for k in net.nodes[s[0]].Lmax:
+				if k is not None:
+					if hex_compare(self.node_id, k):
+						if k is not in self.Lmin:
+							self.Lmin[idx] = k
+							return
+
 
 	def __repair_Lmax__(self, key, pos):
 		idx = -1
 
 		sort_l = []
+		sort_u = []
+		# self.node_id << sort_l << key << sort_u
 		for i in range(len(self.Lmax)):
 			if self.Lmax[i] is not None:
 				if self.Lmax[i] == key:
 					idx = i
-				sort_l.append((self.Lmax[i], self.hex_distance(self.position, self.Lmax[i])))
+				if hex_compare(key, self.Lmax[i]):
+					sort_l.append((self.Lmax[i], self.hex_distance(self.node_id, self.Lmax[i])))
+				else:
+					sort_u.append((self.Lmax[i], self.hex_distance(self.node_id, self.Lmax[i])))
 		if idx == -1:
 			return
 
+		sort_u.sorted(key=lambda x: x[1])
 		sort_l.sorted(key=lambda x: x[1])
-		pass
+		for s in sort_l:
+			for k in net.nodes[s[0]].Lmax:
+				if k is not None:
+					self.Lmax[idx] = k
+					return
 
+		for s in sort_u:
+			for k in net.nodes[s[0]].Lmin:
+				if k is not None:
+					if hex_compare(k, self.node_id):
+						if k is not in self.Lmax:
+							self.Lmax[idx] = k
+							return
 
 
 	def repair_L(self, key, pos):
-		"""
-		Repairing the leaf set
-		Assume that a leaf L−k fails. (−L/2 < k < 0).
-		In this case, the node contacts L−L/2.
-		It gets its leaf set and merges it with its leaf set.
-		For any new nodes added, it verifies their existence by pinging
-		them.
-		"""
 		self.__repair_Lmin__(key, pos)
 		self.__repair_Lmax__(key, pos)
 

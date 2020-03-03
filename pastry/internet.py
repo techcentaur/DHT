@@ -64,7 +64,7 @@ class Internet():
 	def __delete__(self):
 		key = random.choice(list(net.nodes.keys()))
 		pos = net.nodes[key].position
-		print("[?] Deleting: node {} at position {}".format(key, pos))
+		# print("[?] Deleting: node {} at position {}".format(key, pos))
 
 		# delete this node
 		del net.nodes[key]
@@ -73,13 +73,13 @@ class Internet():
 		for k, v in self.nodes.items():
 			v.repair(key, pos)
 
-		res = net.check_key(key)
-		if not res:
-			print("[.] Deleted: node {} at position {}".format(key, pos))
-		else:
-			print("[*] Couldn't delete!")
+		# res = net.check_key(key)
+		# if not res:
+		# 	print("[.] Deleted: node {} at position {}".format(key, pos))
+		# else:
+		# 	print("[*] Couldn't delete!")
 		# input()
-		
+
 	def check_key(self, key):
 		for v, n in net.nodes.items():
 			if n.is_key_present(key):

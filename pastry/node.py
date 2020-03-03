@@ -10,7 +10,7 @@ class Node():
 		self.node_id = node_id
 		self.position = position
 		self.R = [[None for j in range(pow(2, b))] for i in range(hash_size)]
-		self.M = [None for x in range(pow(2, b))]
+		self.M = [None for x in range(pow(2, b+1))]
 		self.Lmin = [None for x in range(pow(2, b-1))]
 		self.Lmax = [None for x in range(pow(2, b-1))] 
 		self.HT = {}
@@ -288,78 +288,84 @@ class Node():
 	def __repair_Lmin__(self, key, pos):
 		idx = -1
 
-		sort_l = []
-		sort_u = []
-		# sort_l << key << sort_u << self.node_id
 		for i in range(len(self.Lmin)):
 			if self.Lmin[i] is not None:
 				if self.Lmin[i] == key:
+					self.Lmin[i] = None
 					idx = i
-				else:
-					if hex_compare(self.Lmin[i], key):
-						sort_u.append((self.Lmin[i], hex_distance(self.node_id, self.Lmin[i])))
-					else:
-						sort_l.append((self.Lmin[i], hex_distance(self.node_id, self.Lmin[i])))
-		if idx == -1:
+
+		if idx==-1:
 			return
 
-		sort_u.sort(key=lambda x: x[1])
-		sort_l.sort(key=lambda x: x[1])
+		sort_lmin = []
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				sort_lmin.append((i, hex_different_index(self.node_id, self.Lmin[i])))
 
-		for s in sort_u:
-			for k in net.nodes[s[0]].Lmin:
-				if k is not None:
-					if k not in self.Lmin:
-						self.Lmin[idx] = k
-						return
-		for s in sort_l:
-			for k in net.nodes[s[0]].Lmax:
-				if k is not None:
-					if hex_compare(self.node_id, k):
-						if k not in self.Lmin:
-							self.Lmin[idx] = k
-							return
-		self.Lmin[idx] = None
+		sort_lmin.sort(key=lambda x: x[1])
+	
+		x, y = -1, -1
+		k = None
+
+		if len(sort_lmin)>0:
+			for i in net.nodes[ self.Lmin[sort_lmin[-1][0]] ].Lmin:
+				if i is not None:
+					a, b = hex_distance(i, self.node_id)
+					if ((a > x) or (a==x and b < y)) and (i not in self.Lmin) and (i != key):
+						x, y = a, b
+						k = i
+
+			for i in net.nodes[ self.Lmin[sort_lmin[-1][0]] ].Lmax:
+				if i is not None:
+					a, b = hex_distance(i, self.node_id)
+					if ((a > x) or (a==x and b < y)) and (i not in self.Lmin) and (i != key):
+						x, y = a, b
+						k = i
+
+		self.Lmin[idx] = k
 
 
 	def __repair_Lmax__(self, key, pos):
 		idx = -1
 
-		sort_l = []
-		sort_u = []
-		# self.node_id << sort_l << key << sort_u
 		for i in range(len(self.Lmax)):
 			if self.Lmax[i] is not None:
 				if self.Lmax[i] == key:
+					self.Lmax[i] = None
 					idx = i
-				else:
-					if hex_compare(key, self.Lmax[i]):
-						sort_l.append((self.Lmax[i], hex_distance(self.node_id, self.Lmax[i])))
-					else:
-						sort_u.append((self.Lmax[i], hex_distance(self.node_id, self.Lmax[i])))
-		if idx == -1:
+					break
+		if idx==-1:
 			return
 
-		sort_u.sort(key=lambda x: x[1])
-		sort_l.sort(key=lambda x: x[1])
+		sort_lmax = []
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				sort_lmax.append((i, hex_different_index(self.node_id, self.Lmax[i])))
 
-		for s in sort_l:
-			for k in net.nodes[s[0]].Lmax:
-				if k is not None:
-					self.Lmax[idx] = k
-					return
+		sort_lmax.sort(key=lambda x: x[1])
+	
+		x, y = -1, -1
+		k = None
+		if len(sort_lmax) > 0:
+			for i in net.nodes[ self.Lmax[sort_lmax[-1][0]] ].Lmin:
+				if i is not None:
+					a, b = hex_distance(i, self.node_id)
+					if ((a > x) or (a==x and b < y)) and (i not in self.Lmax) and (i != key):
+						x, y = a, b
+						k = i
 
-		for s in sort_u:
-			for k in net.nodes[s[0]].Lmin:
-				if k is not None:
-					if hex_compare(k, self.node_id):
-						if k not in self.Lmax:
-							self.Lmax[idx] = k
-							return
-		self.Lmax[idx] = None
+			for i in net.nodes[ self.Lmax[sort_lmax[-1][0]] ].Lmax:
+				if i is not None:
+					a, b = hex_distance(i, self.node_id)
+					if ((a > x) or (a==x and b < y)) and (i not in self.Lmax) and (i != key):
+						x, y = a, b
+						k = i
+
+		self.Lmax[idx] = k
 
 	def repair_R(self, key, pos):
 		idx = -1
+		# print(self.R)
 
 		for i in range(len(self.R)):
 			for j in range(len(self.R[0])):
@@ -367,63 +373,66 @@ class Node():
 					if self.R[i][j] == key:
 						self.R[i][j] = None
 						idx = (i, j)
+						# break
+			# else:
+				# continue
+			# break
 
-		if idx is -1:
-			return
+		if idx == -1:
+			return -1
 
 		(i, j) = idx
 		for k in range(len(self.R[0])):
-			if k != j:
-				if self.R[i][k] is not None:
-					pos2 = net.nodes[self.R[i][k]].position
-					if net.nodes[self.R[i][k]].R[i][j] is not None:
+			if (k != j) and (self.R[i][k] is not None):
+				pos2 = net.nodes[self.R[i][k]].position
+				if net.nodes[self.R[i][k]].R[i][j] is not None:
+					if net.nodes[self.R[i][k]].R[i][j] != key:
 						self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
-						break
-		else:
-			for k in range(i+1, len(self.R)):
-				for l in range(len(self.R[0])):
-					if l != j:
-						if self.R[k][l] is not None:
-							if net.nodes[self.R[k][l]].R[i][j] is not None:
-								self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
-								break
-				else:
-					continue
-				break
+						return 1
 
+		for k in range(i+1, len(self.R)):
+			for l in range(len(self.R[0])):
+				if l != j:
+					if (self.R[k][l] is not None) and (self.R[k][l] is not key):
+						if net.nodes[self.R[k][l]].R[i][j] is not None:
+							if net.nodes[self.R[k][l]].R[i][j] != key:
+								self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
+								return 2
+		return 3
 
 	def repair_M(self, key, pos):
+		# print(self.M)
 		idx = -1
+		# print("MMM", self.M)
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
 				if self.M[i][1] == key:
-					# self.M[i] = None
+					self.M[i] = None
 					idx = i
 					break
-		if idx==-1:
+		if idx == -1:
 			return
-
-		# print(self.M)
-		# print(idx, " idx", i, " i")
 
 		sort_M = []
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
-				if i != idx:
-					sort_M.append((i, distance_metric(self.position, self.M[i][0])))
+				sort_M.append((i, distance_metric(self.position, self.M[i][0])))
 		sort_M.sort(key=lambda x: x[1])
 
-		for j in sort_M:
-			tmp = []
-			for i in net.nodes[self.M[j[0]][1]].M:
-				if (i is not None) and (i[0] != self.position):
-					if i not in self.M:
-						tmp.append((i, distance_metric(self.position, i[0])))
-			tmp.sort(key=lambda x: x[1])
 
-			if len(tmp) > 0:
-				self.M[idx] = tmp[0][0]
-				return
+		# print("SORT", sort_M)
+		values = []
+		# print("NEIGH", net.nodes[ self.M[sort_M[-1][0]][1] ].M)
+		for i in net.nodes[ self.M[sort_M[-1][0]][1] ].M:
+			if i is not None:
+				# print("i ", i)
+				values.append((i, distance_metric(self.position, i[0])))
+		values.sort(key=lambda x: x[1])
+
+		for i in values:
+			if i[0][1] != key:
+				if i[0] not in self.M:
+					self.M[idx] = i[0]
 		# print(self.M)
 
 
@@ -436,3 +445,34 @@ class Node():
 		self.repair_R(key, pos)
 		self.repair_L(key, pos)
 
+	def is_key_present(self, key):
+		# M
+		for i in range(len(self.M)):
+			if self.M[i] is not None:
+				if self.M[i][1] == key:
+					print("M")
+					return True
+
+		# R
+		for i in range(len(self.R)):
+			for j in range(len(self.R[0])):
+				if self.R[i][j] is not None:
+					if self.R[i][j] == key:
+						print("R")
+						return True
+
+		# Lmin
+		for i in range(len(self.Lmin)):
+			if self.Lmin[i] is not None:
+				if self.Lmin[i] == key:
+					print("Lmin")
+					return True
+
+		# Lmax
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				if self.Lmax[i] == key:
+					print("Lmax")
+					return True
+
+		return False

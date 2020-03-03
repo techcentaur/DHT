@@ -79,34 +79,33 @@ class Experiment:
 			print("[*] Adding {} nodes to pastry!".format(number["nodes"]))
 			self.n.add_nodes(number["nodes"])
 
-			print("[*] Deleting {} nodes to pastry!".format(int(number["nodes"])/2))
+			print("[*] Deleting {} nodes to pastry!".format(int(number["nodes"]/2)))
 			net.delete(int(number["nodes"]/2))
 
-			print("[?] Trying to add {} data-points in the pastry...".format(number["data"]))
-			data = get_random_file_msg(number["data"])
-			for d in data:
-				self.n.insert(d[0], d[1])
-			print("[+] Successfully added {} data-points!".format(number["data"]))
+			# print("[?] Trying to add {} data-points in the pastry...".format(number["data"]))
+			# data = get_random_file_msg(number["data"])
+			# for d in data:
+			# 	self.n.insert(d[0], d[1])
+			# print("[+] Successfully added {} data-points!".format(number["data"]))
 
-			hops = self.n.lookup_n_queries(number["data"], number["queries"])
-			print("\t[HOPS]: ", hops)
+			# hops = self.n.lookup_n_queries(number["data"], number["queries"])
+			# print("\t[HOPS]: ", hops)
 
-			avg = self.avg_hops(hops)
-			print("[*] Average number of hops: ", avg)
+			# avg = self.avg_hops(hops)
+			# print("[*] Average number of hops: ", avg)
 
-			self.save_histogram(hops, number, "pastry_half_deleted_nodes_", "(Deleted Half Nodes)")
-
+			# self.save_histogram(hops, number, "pastry_half_deleted_nodes_", "(Deleted Half Nodes)")
 
 
 
 if __name__ == '__main__':
 	n = Network(v=False)
 
-	data = {"nodes": 10, "data": 100, "queries": 1000}
+	data = {"nodes": 20, "data": 100, "queries": 100}
 
 	exp = Experiment()
 	# exp.run(data)
 
-	net.restart_internet()
+	# net.restart_internet()
 	exp.run(data, delete=True)
 

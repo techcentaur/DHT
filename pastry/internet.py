@@ -58,6 +58,19 @@ class Internet():
 		hesh =  md5(string.encode()).hexdigest()[:hash_size]
 		self.deleted_nodes[hesh] = True
 
+	def delete(self):
+		key = random.choice(list(self.nodes.keys()))
+		pos = self.nodes[key].position
+
+		# delete this node
+		self.nodes.pop(key, None)
+		self.P[pos[0], pos[1]] = 0
+		self.deleted_nodes[key] = True
+
+		for k, v in self.nodes.items():
+			v.repair(key, pos)
+
+
 	def debug(self):
 		for v, n in net.nodes.items():
 			if not self.deleted_nodes[v]:

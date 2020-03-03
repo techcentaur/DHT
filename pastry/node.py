@@ -284,7 +284,7 @@ class Node():
 				return self.deliver(msg, key)
 			return net.nodes[k].forward(msg, key)
 
-	def __repair_Lmin__(self):
+	def __repair_Lmin__(self, key, pos):
 		# for i in range(len(self.Lmin)):
 		# 	if self.Lmin[i] is not None:
 		# 		pos = net.nodes[self.Lmin[i]].position
@@ -292,10 +292,24 @@ class Node():
 
 		pass
 
-	def __repair_Lmax__(self):
+	def __repair_Lmax__(self, key, pos):
+		idx = -1
+
+		sort_l = []
+		for i in range(len(self.Lmax)):
+			if self.Lmax[i] is not None:
+				if self.Lmax[i] == key:
+					idx = i
+				sort_l.append((self.Lmax[i], self.hex_distance(self.position, self.Lmax[i])))
+		if idx == -1:
+			return
+
+		sort_l.sorted(key=lambda x: x[1])
 		pass
 
-	def repair_L(self):
+
+
+	def repair_L(self, key, pos):
 		"""
 		Repairing the leaf set
 		Assume that a leaf L−k fails. (−L/2 < k < 0).
@@ -304,50 +318,56 @@ class Node():
 		For any new nodes added, it verifies their existence by pinging
 		them.
 		"""
-		self.__repair_Lmin__()
-		self.__repair_Lmax__()
+		self.__repair_Lmin__(key, pos)
+		self.__repair_Lmax__(key, pos)
 
-	def repair_R(self):
+	def repair_R(self, key, pos):
+		idx = -1
+
 		for i in range(len(self.R)):
 			for j in range(len(self.R[0])):
 				if self.R[i][j] is not None:
-					pos = net.nodes[self.R[i][j]].position
-					if not net.ping(pos[0], pos[1]):
-						flag=True
-						for k in range(len(self.R[0])):
-							if k != j:
-								if self.R[i][k] is not None:
-									pos2 = net.nodes[self.R[i][k]].position
-									if net.ping(pos2[0], pos2[1]):
-										if net.nodes[self.R[i][k]].R[i][j] is not None:
-											self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
-											flag=False
-											break
-						write_flag=True
-						if flag:
-							for k in range(i+1, len(self.R)):
-								for l in range(len(self.R[0])):
-									if l != j:
-										if self.R[k][l] is not None:
-											pos1 = net.nodes[self.R[k][l]].position
-											if net.ping(pos1[0], pos1[1]):
-												if net.nodes[self.R[k][l]].R[i][j] is not None:
-													self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
-													write_flag=False
-													break
-								if not write_flag:
-									break
-							if not write_flag:
-								break
-						# None has been changed
+					if self.R[i][j] == key:
+						idx = (i, j)
+						break
+			else:
+				continue
+			break
 
-	def repair_M(self):
-		none = []
+		if idx is -1:
+			return
+
+		(i, j) = idx
+		flag=False
+		for k in range(len(self.R[0])):
+			if k != j:
+				if self.R[i][k] is not None:
+					pos2 = net.nodes[self.R[i][k]].position
+					if net.nodes[self.R[i][k]].R[i][j] is not None:
+						self.R[i][j] = net.nodes[self.R[i][k]].R[i][j]
+						break
+		else:
+			for k in range(i+1, len(self.R)):
+				for l in range(len(self.R[0])):
+					if l != j:
+						if self.R[k][l] is not None:
+							if net.nodes[self.R[k][l]].R[i][j] is not None:
+								self.R[i][j] = net.nodes[self.R[k][l]].R[i][j]
+								break
+				else:
+					continue
+				break
+
+
+	def repair_M(self, key, pos):
+		idx = -1
 		for i in range(len(self.M)):
 			if self.M[i] is not None:
-				if not net.ping(self.M[i][0][0], self.M[i][0][1]):
-					self.M[i] = None
-					none.append(i)
+				if self.M[i][1] == key:
+					idx = i
+					break
+		if idx==-1:
+			return
 
 		sort_M = []
 		for i in range(len(self.M)):
@@ -355,28 +375,21 @@ class Node():
 				sort_M.append((i, distance_metric(self.position, self.M[i][0])))
 		sort_M.sort(key=lambda x: x[1])
 
-		b=len(none)
 		for j in sort_M:
 			tmp = []
 			for i in net.nodes[self.M[j[0]][1]].M:
 				if (i is not None) and (i[0] != self.position):
 					if i not in self.M:
-						if net.ping(i[0][0], i[0][1]):
-							tmp.append((i, distance_metric(self.position, i[0])))
+						tmp.append((i, distance_metric(self.position, i[0])))
 			tmp.sort(key=lambda x: x[1])
 
-
-			_range_ = min(len(tmp), len(none))
-			for i in range(_range_):
-				self.M[none[i]] = tmp[i][0]
-				b -= 1
-			if b<=0:
+			if len(tmp) > 0:
+				self.M[idx] = tmp[0][0]
 				break
-			none = none[b:]
 
-	def repair(self):
-		self.repair_M()
-		self.repair_R()
-		# self.repair_L()
+	def repair(self, key, pos):
+		self.repair_M(key, pos)
+		self.repair_R(key, pos)
+		self.repair_L(key, pos)
 
 

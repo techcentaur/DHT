@@ -20,7 +20,7 @@ def do_tests(n, num_nodes, num_files):
 	# 	print("[##] Inserting -> (msg, key): ", d)
 	# 	n.insert(d[0], d[1])
 
-	net.debug()
+	# net.debug()
 	# for d in data:
 	# 	res = n.lookup(d[1])
 	# 	print("[!] LOOKUP: {} -> {} | {}".format(d[1], res, res==d[0]))

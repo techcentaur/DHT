@@ -4,8 +4,9 @@ from node import Node
 from internet import net # global object
 
 from constats import *
-from test import (do_tests, get_hash)
 
+def get_hash(string):
+	return md5(string.encode()).hexdigest()[:hash_size]
 
 class Network():
 	def __init__(self, v):
@@ -46,11 +47,3 @@ class Network():
 	def add_nodes(self, num=1):
 		for i in range(num):
 			self.add_node()
-
-
-if __name__ == '__main__':
-	n = Network(v=True)
-	do_tests(n, num_nodes=20, num_files=0)
-
-
-

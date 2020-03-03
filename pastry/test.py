@@ -1,6 +1,7 @@
 from hashlib import md5
 from internet import net
 from constats import *
+from network import Network
 
 def get_hash(string):
 	return md5(string.encode()).hexdigest()[:hash_size]
@@ -23,11 +24,13 @@ def do_tests(n, num_nodes, num_files):
 	# for d in data:
 	# 	res = n.lookup(d[1])
 	# 	print("[!] LOOKUP: {} -> {} | {}".format(d[1], res, res==d[0]))
-	
-	while int(input()):
-		a = int(input())
-		b = int(input())
-		net.dead((a,b))
-		for v, n1 in net.nodes.items():
-			n1.repair()
-		net.debug()
+
+
+	# delete a random element which then tells everyone to repair
+	# if their some set/table contained him
+	net.delete()
+
+
+if __name__ == '__main__':
+	n = Network(v=True)
+	do_tests(n, num_nodes=20, num_files=0)

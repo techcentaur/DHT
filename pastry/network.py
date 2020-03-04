@@ -12,6 +12,25 @@ class Network():
 	def __init__(self, v):
 		self.v = v
 
+		self.num_data = 0
+		self.search_queries = 0
+		self.num_nodes_queries = 0
+
+	def summary(self):
+		print("\n[*] NETWORK SUMMARY")
+		print("[.] Total number of nodes: ", self.num_nodes_queries - (net.del_nodes))
+		print("[.] Total number of data elements: ", self.num_data)
+		print("[.] Total search queries: ", self.search_queries)
+		print("[.] Total node add queries: ", self.num_nodes_queries)
+		print("[.] Total node delete queries: ", net.del_nodes)
+		print("[.] Total data add queries: ", self.num_data)
+
+	def restart(self):
+		self.num_data = 0
+		self.search_queries = 0
+		self.num_nodes_queries = 0
+
+
 	def add_node(self):
 		x, y = net.get_new_coordinates()
 		node_hash = get_hash(str(x) + "+" + str(y))
@@ -37,6 +56,7 @@ class Network():
 		net.nodes[node_hash].transmit_state()
 
 	def lookup_n_queries(self, points, num=1):
+		self.search_queries = num
 		hops = {}
 		for i in range(num):
 			rand = random.randrange(1, points)
@@ -52,8 +72,11 @@ class Network():
 		return hops
 
 	def insert(self, msg, key):
+		self.num_data += 1
 		res = (next(iter(net.nodes.values()))).forward(msg, key)
 
 	def add_nodes(self, num=1):
+		self.num_nodes_queries = num
 		for i in range(num):
 			self.add_node()
+

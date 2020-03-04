@@ -7,6 +7,7 @@ class Internet():
 		self.nodes = {}
 		self.P = [[0 for i in range(N)] for i in range(N)]
 		self.deleted_nodes = {}
+		self.del_nodes = 0
 
 	def get_new_coordinates(self):
 		while True:
@@ -64,21 +65,14 @@ class Internet():
 	def __delete__(self):
 		key = random.choice(list(net.nodes.keys()))
 		pos = net.nodes[key].position
-		# print("[?] Deleting: node {} at position {}".format(key, pos))
 
-		# delete this node
 		del net.nodes[key]
 		net.P[pos[0]][pos[1]] = 0
 
 		for k, v in self.nodes.items():
 			v.repair(key, pos)
 
-		# res = net.check_key(key)
-		# if not res:
-		# 	print("[.] Deleted: node {} at position {}".format(key, pos))
-		# else:
-		# 	print("[*] Couldn't delete!")
-		# input()
+		self.del_nodes += 1
 
 	def check_key(self, key):
 		for v, n in net.nodes.items():
@@ -95,6 +89,7 @@ class Internet():
 		self.nodes = {}
 		self.P = [[0 for i in range(N)] for i in range(N)]
 		self.deleted_nodes = {}
+		self.del_nodes = 0
 
 
 net = Internet()

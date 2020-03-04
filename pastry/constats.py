@@ -1,5 +1,5 @@
 b = 4
-N = 20
+N = 50
 hash_size = 16
 
 JOIN_MESSAGE = "JOIN_PASTRY"

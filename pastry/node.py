@@ -256,7 +256,7 @@ class Node():
 			return 1
 		elif msg==LOOKUP_MESSAGE:
 			# return self.HT[key]
-			return 1
+			return 0
 		else:
 			self.HT[key] = msg
 			return 1

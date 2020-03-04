@@ -15,19 +15,6 @@ def get_random_file_msg(num):
 		stuff.append(("file {}".format(i), get_hash("key {}".format(i))))
 	return stuff
 
-def do_tests(n, num_nodes, num_files):
-	n.add_nodes(num_nodes)
-	net.debug()
-	# for d in data:
-	# 	res = n.lookup(d[1])
-	# 	print("[!] LOOKUP: {} -> {} | {}".format(d[1], res, res==d[0]))
-
-
-	# delete a random element which then tells everyone to repair
-	# if their some set/table contained him
-	net.delete()
-	net.debug()
-
 
 class Experiment:
 	def __init__(self, v=False):
@@ -46,11 +33,11 @@ class Experiment:
 	def save_histogram(self, hops, number, prefix1, prefix2):
 		plt.clf()
 		plt.bar(hops.keys(), hops.values(), color='b')
-		plt.title('Pastry | {} nodes and {} data-points {}- Histogram on Hops'.format(number["nodes"], number["data"], prefix2))
+		plt.title('Pastry | {} nodes {}- Histogram of Hops'.format(number["nodes"], prefix2), fontsize=10)
 		plt.xlabel('Number of Hops')
 		plt.ylabel('Number of Queries')
 
-		fig1 = "{}_{}_nodes.png".format(prefix1, number["nodes"])
+		fig1 = "{}_{}_nodes.svg".format(prefix1, number["nodes"])
 		plt.savefig(fig1)
 		print("[+] Histogram saved as: {}".format(fig1))
 
@@ -100,22 +87,40 @@ class Experiment:
 			avg = self.avg_hops(hops)
 			print("[*] Average number of hops: ", avg)
 
-			self.save_histogram(hops, number, "pastry_half_deleted_nodes_", "(Deleted Half Nodes)")
+			self.save_histogram(hops, number, "pastry_half_deleted", "(Deleted Half Nodes)")
 
+	def network_summary(self):
+		self.n.summary()
 
+	def restart_internet(self):
+		self.n.restart()
+		net.restart_internet()
 
-if __name__ == '__main__':
-	n = Network(v=False)
-
-	data = {"nodes": 100, "data": 1000, "queries": 10000}
-
+def main(data):
 	exp = Experiment()
 	exp.run(data)
 
 	print("\n" + "="*30)
 	print("[!] Internet Rebooted! [!]")
 	print("="*30 + "\n")
-	net.restart_internet()
+	exp.restart_internet()
 
 	exp.run(data, delete=True)
+	# exp.network_summary()
+
+
+if __name__ == '__main__':
+	data = {
+		"nodes": 100,
+		"data": 10000,
+		"queries": 1000000
+	}
+	main(data)
+
+	# import random
+	# key = random.choice(list(net.nodes.keys()))
+	# for i in net.nodes[key].R:
+	# 	print(i)
+
+
 

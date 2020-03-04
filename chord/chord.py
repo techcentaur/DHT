@@ -45,7 +45,7 @@ class Chord:
 			return hex(int('0x'+key, 16) % (2**self.m))[2:]
 
 	def find_successor(self, key, hops=False, verbose=False):
-		h = 0
+		h = 1
 		
 		__key = self.get_hash(key)
 		pointer = self.first_node

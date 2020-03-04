@@ -53,6 +53,7 @@ class IntegerTest:
 
 	def deletion(self, num=1):
 		for i in range(num):
+			print(i)
 			self.chord.leave_node_by_key(self.nodes_ids[i])
 			self.chord.fix_fingers()
 
